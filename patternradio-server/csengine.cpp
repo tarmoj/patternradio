@@ -34,23 +34,27 @@ void CsEngine::run()
 
     // kas siin üldse performance threadi vaja? vt. soundcarpet v CsdPlayerQt
 
-	QList <MYFLT> oldActive, active;
-	oldActive <<  0 << 0 <<0; // perhaps there is better way to define an empty list;
-	active <<  0 << 0 <<0;
-
+	QList <MYFLT> oldValue, free;
+	oldValue <<  1 << 1 <<1; // perhaps there is better way to define an empty list;
+	free <<  1 << 1 <<1;
+	QString channel;
 	while (!mStop  && perfThread.GetStatus() == 0 ) {
 		usleep(10000);  // ? et ei teeks tööd kogu aeg
 		for (int i=0;i<3;i++) {
-			active[i] = getChannel("active"+QString::number(i+1));
-			if (active[i]!=oldActive[i]) {
-				emit channelValue(i,active[i]); // TEST
-
-				if (active[i]==0) { // instruments has ended
-					qDebug()<<"Active "<<i<<" "<<active[i];
+			channel = "free"+QString::number(i+1);
+			free[i] = getChannel(channel);
+			if (free[i]!=oldValue[i]) {
+				//emit channelValue(i,free[i]); // TEST
+				qDebug()<<"free "<<i<<" "<<free[i];
+				if (free[i]==1) { // instruments has ended
+					qDebug()<<"free "<<i<<" "<<free[i];
 					emit sendNewPattern(i);
+					//free[i]=0;
+					//setChannel(channel,0); // for any case
 				}
-				oldActive[i] = active[i];
+
 			}
+			oldValue[i] = free[i];
 		}
 	}
     qDebug()<<"Stopping thread";
@@ -102,8 +106,9 @@ void CsEngine::handleMessage(QString message)
 	for (int j=0, i=messageParts.indexOf("steps:")+1 ; i<messageParts.length(); i++, j++ ) { // statements to store steps into 2d array giMartix[voice][step]
 		code += "giMatrix["+voice+"]["+QString::number(j) + "] = " + messageParts[i] +  "\n";
 	}
-
-	code += "\nschedule \"playPattern\",0,0," + repeatNtimes + "," + afterNSquares + "," + voice + "," + panOrSpeaker;
+	QString instrument = "nstrnum(\"playPattern\")+"+QString::number(voice.toFloat()/10);  // add a fraction to every pattern
+	qDebug()<<instrument;
+	code += "\nschedule "+instrument + ",0,0," + repeatNtimes + "," + afterNSquares + "," + voice + "," + panOrSpeaker;
 	qDebug()<<"Message to compile: "<<code;
 	compileOrc(code);
 
