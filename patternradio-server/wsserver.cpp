@@ -131,7 +131,7 @@ void WsServer::processTextMessage(QString message)
 				}
 		}
 
-	} else if (message.startsWith("clear") || message.contains("init")) { //right now only schedule or init commands are accepted
+	} else if (message.startsWith("clear")) {
 		int voice = messageParts[1].toInt();
 		patternQue[voice].clear();
 		names[voice].clear();
@@ -193,7 +193,7 @@ void WsServer::sendFirstMessage(int voice)
 	}
 	if (patternQue[voice].isEmpty()) {
 		qDebug()<<"patternQue["<<voice<<"] is empty";
-		emit newMessage("clear,"+QString::number(voice));
+		//emit newMessage("clear,"+QString::number(voice));
 		return;
 	}
 
@@ -205,6 +205,7 @@ void WsServer::sendFirstMessage(int voice)
 		names[voice].removeFirst();
 	//emit namesChanged(voice, names[voice].join("\n"));
 	sendToMonitors("names,"+QString::number(voice)+","+names[voice].join("\n"));
+	sendToMonitors(firstMessage);
 
 }
 

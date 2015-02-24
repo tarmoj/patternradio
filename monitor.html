@@ -12,15 +12,35 @@
     
 		function onMessage(evt)
 		{
-			// does server send any messages at all?
 			writeToScreen("Message from server: " + evt.data + '\n');
 			var mess_array = evt.data.split(",");
 			console.log(mess_array[0]);
+			var currentName = ["currentLow","currentMedium","currentHigh"];
+			var names = ["lownames","mediumnames","highnames"];
+			var steps = ["lowsteps", "mediumsteps", "highsteps"];
+			var voice;
 			if (mess_array[0] == "names") {	 // comes in as names,<voice number>, <names separated with \n
-				document.myform.lownames.innerHTML=mess_array[2]; //TODO:
+				voice = parseInt(mess_array[1]);
+				console.log("voice",voice,"id:",names[voice],mess_array[2]);
+				document.getElementById("lownames").innterHTML = mess_array[2]; 
+				
 			}
 			if (mess_array[0] == "clear") {	 // comes in as names,<voice number>, <names separated with \n
-				document.myform.lownames.innerHTML=""; //TODO:
+				voice = parseInt(mess_array[1]);
+				document.getElementById(names[voice]).innerHTML=""; //TODO:
+				document.getElementById(currentName[voice]).innerHTML = "Nobody";
+			}
+			if (mess_array[0]==="pattern") {
+				voice = parseInt(mess_array[2]);
+				var name = mess_array[1];
+				//console.log("Name: ", name)
+				document.getElementById(currentName[voice]).innerHTML = name;
+				var stepString = mess_array.slice(mess_array.indexOf("steps:")+1);
+				document.getElementById(steps[voice]).innerHTML = stepString;
+				// TODO: function setSteps(voice, stepsArray) ;
+				
+				//var speaker = mess_array[5];
+				//patternRects.itemAt(voice).speaker = parseInt(speaker);
 			}
 		}
     
@@ -34,7 +54,9 @@
 		window.onload = function() {
 			doConnect();
 		};
+	
 		
+	
     </script>
     
     
@@ -52,8 +74,10 @@
   <br><br>
   Low:<br>
   Currently playing: <span id="currentLow">Nobody</span><br>
+  Steps: <span id="lowsteps"></span><br>
   Names in queue:<br>
   <textarea id="lownames" rows="8" readonly></textarea><br>
+  
   
   Server address: <input value="ws://localhost:10010/ws" id="url" type="text"><br>
     <button type="button" id="connectButton" onclick="doConnect();">Connect</button>
