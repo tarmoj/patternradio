@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pattern-radio monitor</title>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <meta content="Tarmo Johannes" id="author">
+    
+    <style></style>
+    
+    <script src="ws-functions.js"></script>
+    <script>
+    
+		function onMessage(evt)
+		{
+			// does server send any messages at all?
+			writeToScreen("Message from server: " + evt.data + '\n');
+			var mess_array = evt.data.split(",");
+			console.log(mess_array[0]);
+			if (mess_array[0] == "names") {	 // comes in as names,<voice number>, <names separated with \n
+				document.myform.lownames.innerHTML=mess_array[2]; //TODO:
+			}
+			if (mess_array[0] == "clear") {	 // comes in as names,<voice number>, <names separated with \n
+				document.myform.lownames.innerHTML=""; //TODO:
+			}
+		}
+    
+		
+    
+		function openAction() {
+			console.log("sending monitor");
+			doSend("monitor");
+		};
+		
+		window.onload = function() {
+			doConnect();
+		};
+		
+    </script>
+    
+    
+    
+  </head>
+  <body>
+  <h1>Pattern-radio monitor</h1>
+  <br>
+  (Explanation.)  Here you can listen to music created by various people.... bla <br>
+  Listen the radio: --- <br>
+  <br>
+  <form name="myform">
+  Clients: <span id="clientsCount"></span><br>
+  Heart-rate: <span id="heatrate">?</span>
+  <br><br>
+  Low:<br>
+  Currently playing: <span id="currentLow">Nobody</span><br>
+  Names in queue:<br>
+  <textarea id="lownames" rows="8" readonly></textarea><br>
+  
+  Server address: <input value="ws://localhost:10010/ws" id="url" type="text"><br>
+    <button type="button" id="connectButton" onclick="doConnect();">Connect</button>
+    <br>
+    <br>
+    <p><textarea id="outputtext" rows="5" cols="30" readonly></textarea> </p>
+  </form>
+  
+  
+  
+  </body>
+</html>

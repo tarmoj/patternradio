@@ -62,6 +62,13 @@ void WsServer::processTextMessage(QString message)
 
 	QStringList messageParts = message.split(",");
 
+
+	if (message.startsWith("monitor")) { // signals server that this is UI page, send new patterns etc there.
+		m_monitors.append(pClient);
+		qDebug()<<"New monitor connected";
+		pClient->sendTextMessage("Hi!");
+	}
+
 	if (message.startsWith("random")) { // create random pattern, add to que format: random,<voice>
 		int voice = messageParts[1].toInt();
 		QString steps="";
@@ -86,7 +93,8 @@ void WsServer::processTextMessage(QString message)
 		//TODO: add name to namesList
 		patternQue[voice].append(message);
 		names[voice].append(messageParts[1]); // store names to list
-		emit namesChanged(voice, names[voice].join("\n"));
+		//emit namesChanged(voice, names[voice].join("\n"));
+		sendToMonitors("names,"+messageParts[2]+","+names[voice].join("\n"));
 		qDebug()<<"New pattern from "<< messageParts[1] << message;
 		qDebug()<<"Messages in list per voice: "<<voice<<": "<<patternQue[voice].count();
 		if (freeToPlay[voice]) {
@@ -147,8 +155,17 @@ void WsServer::socketDisconnected()
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
     if (pClient) {
         m_clients.removeAll(pClient);
+		if (m_monitors.contains(pClient))
+			m_monitors.removeAll(pClient);
         emit newConnection(m_clients.count());
         pClient->deleteLater();
+	}
+}
+
+void WsServer::sendToMonitors(QString message)
+{
+	foreach (QWebSocket *socket, m_monitors) {
+		socket->sendTextMessage(message);
 	}
 }
 
@@ -186,7 +203,8 @@ void WsServer::sendFirstMessage(int voice)
 	emit newMessage(firstMessage);
 	if (!names[voice].isEmpty())
 		names[voice].removeFirst();
-	emit namesChanged(voice, names[voice].join("\n"));
+	//emit namesChanged(voice, names[voice].join("\n"));
+	sendToMonitors("names,"+QString::number(voice)+","+names[voice].join("\n"));
 
 }
 
