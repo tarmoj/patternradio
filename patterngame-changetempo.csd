@@ -11,6 +11,8 @@ nchnls = 2
 ksmps = 32
 
 #define MAXREPETITIONS  #5#
+#define COUNT4LONG #100# ; 100
+#define MAXWAIT #2# ; 10
 
 ;GLOBALS: 
 gkPseudoSlendro[] fillarray  1, 8/7, 4/3,   14/9,  16/9, 2
@@ -30,10 +32,12 @@ gkSquareDuration[] fillarray 0.25, 0.25, 0.25
 gkClock[] init 3
 giPan[] fillarray 0.5, 1, 0
 gkSoundType[] init 3
+gkLastPlay[] init 3
 
 
 giMatrix[][]  init   3,giPatternLength  ; first dimension - voice, second: step or -1
 ;giMatrix[]  init   giPatternLength   ; table to contain which step from scale to play. -1 for don't play  0 - 1st step etc
+giCounter[] init 3 ; count played notes
 
 
 gaSignal[] init 3
@@ -42,7 +46,8 @@ gkFreeToPlay[] init 3 ; flags the show if the voice is playing
 
 ;CHANNELS:
 chn_k "heartrate",1
-chn_k "free1",3
+;chn_k "free1",3
+chn_k "actionNeeded",2
 
 
 chnset 1,"tempo"
@@ -53,7 +58,7 @@ chnset 1, "free3"
 chnset 0.25, "square1"
 chnset 0.25, "square2"
 chnset 0.25, "square3"
-
+chnset 0, "actionNeeded" ; singals that a voice has beeb silent for long time and needs a new random pattern
 ;
 
 seed 0
@@ -123,10 +128,41 @@ instr clockAndChannels
 	gkClock[0] metro gkTempo/gkSquareDuration[0]
 	gkClock[1] metro gkTempo/gkSquareDuration[1]
 	gkClock[2] metro gkTempo/gkSquareDuration[2]
+	;TODO: jälgi, kui free on olnud 1 juba tükk aega, siis anna märku
+	; võibolla: sound salvestag gkLastPlay[ivoice]
+	
+	; check for long silences and signal host
+	if ( trigger(times:k()-gkLastPlay[0], $MAXWAIT,0) == 1) then ; has been idle for too long time
+		chnset k(10),"actionNeeded" ; set ivoice+10 to signal host about the silance
+	endif
+	
+	if ( trigger(times:k()-gkLastPlay[1], $MAXWAIT,0) == 1) then ; has been idle for too long time
+		chnset k(11),"actionNeeded" ; set ivoice+10 to signal host about the silance
+	endif
+	
+	if ( trigger(times:k()-gkLastPlay[2], $MAXWAIT,0) == 1) then ; has been idle for too long time
+		chnset k(12),"actionNeeded" ; set ivoice+10 to signal host about the silance
+	endif
+	
+	; changes to sounds and durations
+	if (metro(1/30,0.1)==1) then
+		chnset  int(random:k(1,6))*0.15, "square1"
+		chnset  int(random:k(1,4))*0.15, "square2"
+		chnset  int(random:k(1,4))*0.15, "square3"	
+	endif 
+	if (metro(1/20,2.2)==1) then
+		chnset  int(random:k(0,5)),"sound1"
+		chnset  int(random:k(0,5)),"sound2"
+		chnset  int(random:k(0,5)),"sound3"
+	endif 
+	
 	
 endin
 
+; to triger actionNeeded
 schedule "playPattern",0, 0,0,5,0
+schedule "playPattern",0.5, 0,0,5,1
+schedule "playPattern",1, 0,0,5,2
 instr playPattern
 	itimes = p4 ; how many times to repeat: 1 means original + 1 repetition
 	irepeatAfter = p5 ; repeat after given squareDurations
@@ -180,8 +216,19 @@ instr sound
 	ifreq =  p5
 	ivoice = p6
 	iatt = 0.05
+	
+	gkLastPlay[ivoice] init times:i()
+	
+	giCounter[ivoice]= giCounter[ivoice] + 1
+	;print giCounter[ivoice]
+	if (giCounter[ivoice]%$COUNT4LONG==0) then
+		p3 = max:i(6, 3 + p3*2)
+		irelease = p3-0.02
+	else
+		irelease = p3/2	
+	endif	
 	;aenv expseg 0.0001, iatt, 1, p3-iatt, 0.0001
-	aenv adsr 0.01,0.01,1, p3/2
+	aenv adsr 0.01,0.01,0.6, irelease
 	; TODO: proovi adsr
 	isound = i(gkSoundType[ivoice]) ;chnget "sound"
 	if (isound==0) then 
@@ -241,7 +288,7 @@ endin
   <g>255</g>
   <b>255</b>
  </bgcolor>
- <bsbObject type="BSBButton" version="2">
+ <bsbObject version="2" type="BSBButton">
   <objectName>play pattern</objectName>
   <x>17</x>
   <y>72</y>
@@ -260,8 +307,8 @@ endin
   <latch>false</latch>
   <latched>true</latched>
  </bsbObject>
- <bsbObject type="BSBDisplay" version="2">
-  <objectName>free1</objectName>
+ <bsbObject version="2" type="BSBDisplay">
+  <objectName>actionNeeded</objectName>
   <x>78</x>
   <y>194</y>
   <width>80</width>
@@ -270,7 +317,7 @@ endin
   <visible>true</visible>
   <midichan>0</midichan>
   <midicc>0</midicc>
-  <label>1.000</label>
+  <label>12.000</label>
   <alignment>left</alignment>
   <font>Liberation Sans</font>
   <fontsize>10</fontsize>
@@ -289,7 +336,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBButton" version="2">
+ <bsbObject version="2" type="BSBButton">
   <objectName>play pattern</objectName>
   <x>19</x>
   <y>107</y>
@@ -308,7 +355,7 @@ endin
   <latch>false</latch>
   <latched>true</latched>
  </bsbObject>
- <bsbObject type="BSBButton" version="2">
+ <bsbObject version="2" type="BSBButton">
   <objectName>play pattern</objectName>
   <x>19</x>
   <y>143</y>
@@ -327,7 +374,7 @@ endin
   <latch>false</latch>
   <latched>true</latched>
  </bsbObject>
- <bsbObject type="BSBSpinBox" version="2">
+ <bsbObject version="2" type="BSBSpinBox">
   <objectName>sound1</objectName>
   <x>39</x>
   <y>292</y>
@@ -354,9 +401,9 @@ endin
   <minimum>0</minimum>
   <maximum>2</maximum>
   <randomizable group="0">false</randomizable>
-  <value>1</value>
+  <value>2</value>
  </bsbObject>
- <bsbObject type="BSBHSlider" version="2">
+ <bsbObject version="2" type="BSBHSlider">
   <objectName>meditation</objectName>
   <x>260</x>
   <y>108</y>
@@ -374,7 +421,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject type="BSBLabel" version="2">
+ <bsbObject version="2" type="BSBLabel">
   <objectName/>
   <x>173</x>
   <y>110</y>
@@ -403,7 +450,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBHSlider" version="2">
+ <bsbObject version="2" type="BSBHSlider">
   <objectName>attention</objectName>
   <x>263</x>
   <y>145</y>
@@ -421,7 +468,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject type="BSBLabel" version="2">
+ <bsbObject version="2" type="BSBLabel">
   <objectName/>
   <x>172</x>
   <y>145</y>
@@ -450,7 +497,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBHSlider" version="2">
+ <bsbObject version="2" type="BSBHSlider">
   <objectName>lowBetaRelative</objectName>
   <x>264</x>
   <y>178</y>
@@ -468,7 +515,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject type="BSBLabel" version="2">
+ <bsbObject version="2" type="BSBLabel">
   <objectName/>
   <x>172</x>
   <y>181</y>
@@ -497,7 +544,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBHSlider" version="2">
+ <bsbObject version="2" type="BSBHSlider">
   <objectName>highBetaRelative</objectName>
   <x>263</x>
   <y>219</y>
@@ -515,7 +562,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject type="BSBLabel" version="2">
+ <bsbObject version="2" type="BSBLabel">
   <objectName/>
   <x>172</x>
   <y>220</y>
@@ -544,7 +591,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBHSlider" version="2">
+ <bsbObject version="2" type="BSBHSlider">
   <objectName>heartrate</objectName>
   <x>183</x>
   <y>365</y>
@@ -562,7 +609,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject type="BSBLabel" version="2">
+ <bsbObject version="2" type="BSBLabel">
   <objectName/>
   <x>79</x>
   <y>371</y>
@@ -592,7 +639,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBDisplay" version="2">
+ <bsbObject version="2" type="BSBDisplay">
   <objectName>heartrate</objectName>
   <x>314</x>
   <y>371</y>

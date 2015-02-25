@@ -35,13 +35,21 @@ void CsEngine::run()
     // kas siin üldse performance threadi vaja? vt. soundcarpet v CsdPlayerQt
 
 	QList <MYFLT> oldValue, free;
+	MYFLT actionNeeded;
 	oldValue <<  1 << 1 <<1; // perhaps there is better way to define an empty list;
 	free <<  1 << 1 <<1;
-	QString channel;
+	QString channel, actionChannel;
 	while (!mStop  && perfThread.GetStatus() == 0 ) {
 		usleep(10000);  // ? et ei teeks tööd kogu aeg
+		actionNeeded = getChannel("actionNeeded");
+		if (actionNeeded>=10) { // a voice has been idle for long time
+			qDebug()<<"Action needed for voice "<< actionNeeded-10;
+			emit doSomething(actionNeeded-10); // signal to wsserever to generate a random message or play an old one;
+			setChannel("actionNeeded",0);
+		}
 		for (int i=0;i<3;i++) {
 			channel = "free"+QString::number(i+1);
+
 			free[i] = getChannel(channel);
 			if (free[i]!=oldValue[i]) {
 				//emit channelValue(i,free[i]); // TEST
@@ -52,7 +60,6 @@ void CsEngine::run()
 					//free[i]=0;
 					//setChannel(channel,0); // for any case
 				}
-
 			}
 			oldValue[i] = free[i];
 		}

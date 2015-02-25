@@ -14,6 +14,8 @@ int main(int argc, char *argv[])
 	QObject::connect(&cs, SIGNAL(sendNewPattern(int)), wsServer, SLOT(setFreeToPlay(int)));
 	QObject::connect(wsServer, SIGNAL(newPropertyValue(QString,double)), &cs, SLOT(handleChannelChange(QString,double)));
 	QObject::connect(wsServer, SIGNAL(newCodeToComplie(QString)) , &cs, SLOT(compileOrc(QString)));
+	QObject::connect(&cs, SIGNAL(doSomething(int)),wsServer, SLOT(cutTheSilence(int)));
+
 
 
 	cs.start();

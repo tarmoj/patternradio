@@ -37,6 +37,7 @@ public:
 signals:
 	void sendNewPattern(int voice); // sent when a new pattern can be sent for the voice
 	void channelValue(int voice, int value); // TeST only
+	void doSomething(int voice);
 
 public slots:
 	void handleMessage(QString message); //

@@ -22,13 +22,14 @@
 			if (mess_array[0] == "names") {	 // comes in as names,<voice number>, <names separated with \n
 				voice = parseInt(mess_array[1]);
 				console.log("voice",voice,"id:",names[voice],mess_array[2]);
-				document.getElementById("lownames").innterHTML = mess_array[2]; 
+				document.getElementById(names[voice]).innerHTML = mess_array[2];
 				
 			}
 			if (mess_array[0] == "clear") {	 // comes in as names,<voice number>, <names separated with \n
 				voice = parseInt(mess_array[1]);
 				document.getElementById(names[voice]).innerHTML=""; //TODO:
 				document.getElementById(currentName[voice]).innerHTML = "Nobody";
+				document.getElementById(steps[voice]).innerHTML = "";
 			}
 			if (mess_array[0]==="pattern") {
 				voice = parseInt(mess_array[2]);
@@ -62,21 +63,46 @@
     
     
   </head>
-  <body>
+  <body style="max-width:600px">
   <h1>Pattern-radio monitor</h1>
   <br>
   (Explanation.)  Here you can listen to music created by various people.... bla <br>
   Listen the radio: --- <br>
   <br>
   <form name="myform">
-  Clients: <span id="clientsCount"></span><br>
+  <br>
   Heart-rate: <span id="heatrate">?</span>
   <br><br>
-  Low:<br>
-  Currently playing: <span id="currentLow">Nobody</span><br>
-  Steps: <span id="lowsteps"></span><br>
-  Names in queue:<br>
-  <textarea id="lownames" rows="8" readonly></textarea><br>
+  Info about playing voices:<br>
+   <table border="1" style="width:90%">
+  <tr>
+    <td>Low</td>
+    <td>Medium</td>
+    <td>High</td>
+  </tr>
+  <tr>
+    <td>
+    Currently playing: <span id="currentLow">Nobody</span><br>
+	Steps: <span id="lowsteps"></span><br>
+	Names in queue:<br>
+	<textarea id="lownames" rows="8" readonly></textarea><br><br>
+    
+    </td>
+    <td>
+    Currently playing: <span id="currentMedium">Nobody</span><br>
+	Steps: <span id="mediumsteps"></span><br>
+	Names in queue:<br>
+	<textarea id="mediumnames" rows="8" readonly></textarea><br><br>
+    </td>
+    <td>
+    Currently playing: <span id="currentHigh">Nobody</span><br>
+	Steps: <span id="highsteps"></span><br>
+	Names in queue:<br>
+	<textarea id="highnames" rows="8" readonly></textarea><br><br>
+    </td>
+  </tr>
+</table> 
+  
   
   
   Server address: <input value="ws://localhost:10010/ws" id="url" type="text"><br>

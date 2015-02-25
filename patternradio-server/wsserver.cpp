@@ -2,8 +2,11 @@
 #include "QtWebSockets/qwebsocketserver.h"
 #include "QtWebSockets/qwebsocket.h"
 #include <QtCore/QDebug>
+#include <QFile>
+#include <QDateTime>
 
 QT_USE_NAMESPACE
+#define LOGFILE "pattern-messages.log"
 
 
 WsServer::WsServer(quint16 port, QObject *parent) :
@@ -54,16 +57,20 @@ int randInt(int low, int high) {
 
 void WsServer::processTextMessage(QString message)
 {
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    if (!pClient) {
-        return;
-    }
+//    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+//    if (!pClient) {
+//        return;
+//    } // - don't need info about client
 	qDebug()<<message;
 
 	QStringList messageParts = message.split(",");
 
 
 	if (message.startsWith("monitor")) { // signals server that this is UI page, send new patterns etc there.
+		QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+		if (!pClient) {
+				return;
+		}
 		m_monitors.append(pClient);
 		qDebug()<<"New monitor connected";
 		pClient->sendTextMessage("Hi!");
@@ -88,15 +95,23 @@ void WsServer::processTextMessage(QString message)
 
 	// pattern-message format: 'pattern' name voice repeatNtimes afterNsquares steps: pitch_index11 pitch_index2
 	if (message.startsWith("pattern")) {
-		//emit newMessage(message);
 		int voice = messageParts[2].toInt();
-		//TODO: add name to namesList
 		patternQue[voice].append(message);
 		names[voice].append(messageParts[1]); // store names to list
 		//emit namesChanged(voice, names[voice].join("\n"));
 		sendToMonitors("names,"+messageParts[2]+","+names[voice].join("\n"));
 		qDebug()<<"New pattern from "<< messageParts[1] << message;
 		qDebug()<<"Messages in list per voice: "<<voice<<": "<<patternQue[voice].count();
+
+		//LOG
+//		QFile logFile(LOGFILE);
+//		if (logFile.open(QIODevice::Append)) {
+//			logFile.write(QDateTime::currentDateTime().toString("dd.MM.yy hh:mm:ss:zzz").toLocal8Bit()+"\n");
+//			logFile.write(" "+message.toLocal8Bit()+"\n");
+//			logFile.close();
+//		} else
+//			qDebug()<<"Could not open logfile "<<LOGFILE;
+
 		if (freeToPlay[voice]) {
 			sendFirstMessage(voice);
 		}
@@ -194,6 +209,7 @@ void WsServer::sendFirstMessage(int voice)
 	if (patternQue[voice].isEmpty()) {
 		qDebug()<<"patternQue["<<voice<<"] is empty";
 		//emit newMessage("clear,"+QString::number(voice));
+		sendToMonitors("clear,"+QString::number(voice));
 		return;
 	}
 
@@ -214,4 +230,11 @@ void WsServer::setFreeToPlay(int voice)
 	qDebug()<<"FREE TO PLAY "<<voice;
 	freeToPlay[voice]=1;
 	sendFirstMessage(voice);
+}
+
+void WsServer::cutTheSilence(int voice)  // called when there has been silence for long time in the voice
+{
+	setFreeToPlay(voice); // for any case
+	processTextMessage("random,"+QString::number(voice)); // generate a random pattern
+	//TODO: read from old messages (log file)
 }

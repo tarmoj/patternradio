@@ -24,6 +24,7 @@ public:
 
 public Q_SLOTS:
 	void setFreeToPlay(int voice);
+	void cutTheSilence(int voice);
 
 Q_SIGNALS:
     void closed();
