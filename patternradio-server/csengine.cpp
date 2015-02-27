@@ -108,17 +108,29 @@ void CsEngine::handleMessage(QString message)
 	QString repeatNtimes = messageParts[3];
 	QString afterNSquares = messageParts[4];
 	QString panOrSpeaker = messageParts[5];
-	// prepare steps for compileOrc:
-	QString code = "";
-	for (int j=0, i=messageParts.indexOf("steps:")+1 ; i<messageParts.length(); i++, j++ ) { // statements to store steps into 2d array giMartix[voice][step]
-		code += "giMatrix["+voice+"]["+QString::number(j) + "] = " + messageParts[i] +  "\n";
-	}
-	QString instrument = "nstrnum(\"playPattern\")+"+QString::number(voice.toFloat()/10);  // add a fraction to every pattern
-	qDebug()<<instrument;
-	code += "\nschedule "+instrument + ",0,0," + repeatNtimes + "," + afterNSquares + "," + voice + "," + panOrSpeaker;
-	qDebug()<<"Message to compile: "<<code;
-	compileOrc(code);
 
+    // prepare steps for compileOrc:
+//	QString code = "";
+//	for (int j=0, i=messageParts.indexOf("steps:")+1 ; i<messageParts.length(); i++, j++ ) { // statements to store steps into 2d array giMartix[voice][step]
+//		code += "giMatrix["+voice+"]["+QString::number(j) + "] = " + messageParts[i] +  "\n";
+//	}
+//    QString instrument = "nstrnum(\"playPattern\")+"+QString::number((voice+1).toFloat()/10);  // add a fraction to every pattern
+//	qDebug()<<instrument;
+//	code += "\nschedule "+instrument + ",0,0," + repeatNtimes + "," + afterNSquares + "," + voice + "," + panOrSpeaker;
+//	qDebug()<<"Message to compile: "<<code;
+//    compileOrc(code);
+
+    // METHOD 2 (compileOrc has now memory leak in Csound) - event and table
+    //create table and send to Csound
+    MYFLT stepArray[16]; // make sure that is is defined in csd with thable number 99
+    for (int j=0, i=messageParts.indexOf("steps:")+1 ; i<messageParts.length(); i++, j++ ) { // statements to store steps into 2d array giMartix[voice][step]
+        stepArray[j]=	 messageParts[i].toDouble();
+        //code += "giMatrix["+voice+"]["+QString::number(j) + "] = " + messageParts[i] +  "\n";
+    }
+    cs.TableCopyIn(90+voice.toInt(),stepArray);
+    QString instrument = QString::number(4 + (voice.toInt()+1)/4); // 4.1 - for low voice, 4.2 vor medium, 4.3 high
+    QString code = "i "+instrument + " 0 5 " + repeatNtimes + " " + afterNSquares + " " + voice + " " + panOrSpeaker;
+    csEvent(code);
 }
 
 void CsEngine::compileOrc(QString code)

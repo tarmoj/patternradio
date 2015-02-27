@@ -21,6 +21,10 @@ gkPelogHarrison[]  fillarray 1, 35/32, 5/4, 21/16, 49/32, 105/64, 7/4, 2
 gkBohlenJust[]  fillarray 1, 25/21, 9/7, 7/5, 5/3, 9/5, 15/7, 7/3, 25/9, 3/1 
 
 gkSteps[] init 16
+giSteps1  ftgen 90,0,16, -2,0 ; table for steps instead of array -  to workaround CopileOrc memory leak
+giSteps2  ftgen 91,0,16, -2,0
+giSteps3  ftgen 92,0,16, -2,0
+
 gkSteps  = gkPseudoSlendro ;gkBohlenJust ;gkPelogHarrison; 
 gkTempo init 1
 giBaseFrequency = 110 ;cpspch(5.02)
@@ -75,7 +79,7 @@ seed 0
 ;schedule "randomPattern", 1, 0, 1, 1
 ;schedule "randomPattern", 2.1, 0, 2, 1 ; last 1 if to repeat
 
- ;alwayson "randomStarter"
+;alwayson "randomStarter"
 instr randomStarter
 	kfree1 init 0
 	kfree1 chnget "free1"
@@ -164,6 +168,8 @@ schedule "playPattern",0, 0,0,5,0
 schedule "playPattern",0.5, 0,0,5,1
 schedule "playPattern",1, 0,0,5,2
 instr playPattern
+	; steps are forwarded from host as table, copy to array for compatibility with the code
+
 	itimes = p4 ; how many times to repeat: 1 means original + 1 repetition
 	irepeatAfter = p5 ; repeat after given squareDurations
 	ivoice = p6 ; three voices
@@ -184,7 +190,8 @@ instr playPattern
 		if (itimes>0 && ivisit<=itimes && kcounter==irepeatAfter-1) then ; for repetition call itself
 			event "i", p1,0, 10,p4,p5,p6,p7, ivisit+1		
 		endif
-		kstep = giMatrix[ivoice][kcounter] 
+		;kstep = giMatrix[ivoice][kcounter] 
+		kstep tab kcounter, 90+ivoice
 		if (kstep > -1) then
 			;printk2 kstep 
 			
@@ -305,7 +312,7 @@ endin
   <image>/</image>
   <eventLine>i "randomPattern" 0 1 0 0</eventLine>
   <latch>false</latch>
-  <latched>true</latched>
+  <latched>false</latched>
  </bsbObject>
  <bsbObject version="2" type="BSBDisplay">
   <objectName>actionNeeded</objectName>
@@ -353,7 +360,7 @@ endin
   <image>/</image>
   <eventLine>i "randomPattern" 0 1 1 0</eventLine>
   <latch>false</latch>
-  <latched>true</latched>
+  <latched>false</latched>
  </bsbObject>
  <bsbObject version="2" type="BSBButton">
   <objectName>play pattern</objectName>
@@ -372,7 +379,7 @@ endin
   <image>/</image>
   <eventLine>i "randomPattern" 0 1 2 0</eventLine>
   <latch>false</latch>
-  <latched>true</latched>
+  <latched>false</latched>
  </bsbObject>
  <bsbObject version="2" type="BSBSpinBox">
   <objectName>sound1</objectName>
