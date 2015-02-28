@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta content="text/html; charset=utf-8" http-equiv="content-type">
-    <title>Pattern game</title>
+    <title>Pattern composer</title>
     <meta content="Tarmo Johannes" id="author">
 	
 	<link type="text/css" rel="stylesheet" href="soundgames.css">
@@ -13,37 +13,26 @@
   </head>
   <body>
 	<span style='margin-left:440px'><small><i><a href="patterngame_est.html">Eesti</a></i></small></span>
-  <h1>Pattern game</h1><br>
+  <h1>Pattern radio</h1><br>
     
+	Listen the radio: <audio controls src="http://johannes.homeip.net:8000/radio"></audio><br><br>
+	<a href=monitor.html  target="_blank">Monitor</a> (info about currently playing melodies, queues etc)<br><br>
+	
+	<h2>Compose new pattern:</h2>
+	
     <form name = "myform">
-    Your name:<input type="text" id="name" value="Anonymous"  style="font-size:16px"></input><br>
+    Your name:<input type="text" id="name" required value="Anonymous" style="font-size:16px"></input><br>
+	
     Octave/range: <input value=0 name="octave" type="radio">low&nbsp;&nbsp; <input
       checked="checked" value=1 name="octave" type="radio">middle&nbsp;&nbsp;
     <input value=2 name="octave" type="radio">high <br>
     <br>
     <br>
-    Choose scale (different set of pitches): 
-     <select id="mode" onchange="setMode(parseInt(this.value));"  style="font-size:22px">
-	<option value="0">(Pseudo) slendro (5 steps)</option>
-	<option value="1">Harrison's pelog (7 steps) </option>
-	<option value="2">Bohlen-Pierce justtone (9 steps)</option>
-	</select> 
-	<br><br>
-	Tap or click on the green squares to build thes sound pattern.
+  	Tap or click on the green squares to build thes sound pattern.
 	<br>
     <div id="container"></div>
     <br>
-     Send to speaker: 
-    <input checked="checked" value=1 name="speaker" type="radio">1 
-    <input value=2 name="speaker" type="radio">2
-    <input value=3 name="speaker" type="radio">3
-    <input value=4 name="speaker" type="radio">4
-    <input value=5 name="speaker" type="radio">5
-    <input value=6 name="speaker" type="radio">6
-    <input value=7 name="speaker" type="radio">7
-    <input value=8 name="speaker" type="radio">8
     <br>
-	<br>
     Play the melody <input type="range" class="range" id="repeatCount" min=0 max=5 step=1 value=0 oninput="repeat_label.value=parseInt(repeatCount.value)+1"
     onchange="oscil.repeatCount=parseInt(this.value+)"> 
     <output name="repeat_label" for="repeatCount" id="repeat_label">0</output>

@@ -22,11 +22,26 @@ WsServer::WsServer(quint16 port, QObject *parent) :
         connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &WsServer::closed);
     }
 	patternQue << QStringList() << QStringList()<<QStringList(); // define the list
-	names << QStringList() << QStringList()<<QStringList();
+    oldPatterns << QStringList() << QStringList()<<QStringList();
+    names << QStringList() << QStringList()<<QStringList();
 	freeToPlay<<1<<1<<1;
-	modeNames<<"Slendro"<<"Pelog"<<"Bohlen-Pierce";
+    modeNames<<"Slendro"<<"Pelog"<<"Bohlen-Pierce"; // not necessary in radio
 	mode = 0;
-
+    // fill list oldPatterns from log file on startup
+    QFile logFile(LOGFILE);
+    if (logFile.open(QIODevice::ReadOnly| QIODevice::Text)) {
+        QTextStream in(&logFile);
+        QString line = in.readLine().simplified();
+        while (!line.isNull()) {
+            if (line.startsWith("pattern")) {
+                int voice = line.split(",")[2].toInt();
+                oldPatterns[voice].append(line);
+            }
+            line = in.readLine().simplified();
+        }
+        logFile.close();
+    } else
+        qDebug()<<"Could not open logfile "<<LOGFILE;
 }
 
 
@@ -96,21 +111,29 @@ void WsServer::processTextMessage(QString message)
 	// pattern-message format: 'pattern' name voice repeatNtimes afterNsquares steps: pitch_index11 pitch_index2
 	if (message.startsWith("pattern")) {
 		int voice = messageParts[2].toInt();
+        //TODO: if startswith patternOLD, mark in name OLD
 		patternQue[voice].append(message);
-		names[voice].append(messageParts[1]); // store names to list
+        QString name = (messageParts[0].contains("OLD")) ? messageParts[1] + " (old)" : messageParts[1]; // DOES NOT WORK YET!
+        names[voice].append(name); // store names to list
 		//emit namesChanged(voice, names[voice].join("\n"));
 		sendToMonitors("names,"+messageParts[2]+","+names[voice].join("\n"));
-		qDebug()<<"New pattern from "<< messageParts[1] << message;
+        qDebug()<<"New pattern from "<< name << message;
 		qDebug()<<"Messages in list per voice: "<<voice<<": "<<patternQue[voice].count();
 
-		//LOG
-//		QFile logFile(LOGFILE);
-//		if (logFile.open(QIODevice::Append)) {
-//			logFile.write(QDateTime::currentDateTime().toString("dd.MM.yy hh:mm:ss:zzz").toLocal8Bit()+"\n");
-//			logFile.write(" "+message.toLocal8Bit()+"\n");
-//			logFile.close();
-//		} else
-//			qDebug()<<"Could not open logfile "<<LOGFILE;
+
+        //LOG - append every new pattern to file
+
+        if (!messageParts[0].contains("OLD")) {
+            oldPatterns[voice].append(message);
+            QFile logFile(LOGFILE);
+            if (logFile.open(QIODevice::Append)) {
+                logFile.write(QDateTime::currentDateTime().toString("dd.MM.yy hh:mm:ss").toLocal8Bit()+"\n");
+                //TODO: add country from IP
+                logFile.write("\t"+message.toLocal8Bit()+"\n");
+                logFile.close();
+            } else
+                qDebug()<<"Could not open logfile "<<LOGFILE;
+        }
 
 		if (freeToPlay[voice]) {
 			sendFirstMessage(voice);
@@ -235,6 +258,15 @@ void WsServer::setFreeToPlay(int voice)
 void WsServer::cutTheSilence(int voice)  // called when there has been silence for long time in the voice
 {
 	setFreeToPlay(voice); // for any case
-	processTextMessage("random,"+QString::number(voice)); // generate a random pattern
-	//TODO: read from old messages (log file)
+    //
+    if (!oldPatterns[voice].isEmpty()) {
+        QString pattern = oldPatterns[voice].takeFirst();
+        //TODO: somehow add "OLD"
+        if (!pattern.startsWith("patternOLD"))
+            pattern.replace("pattern","patternOLD"); // to signal that it comes from the pool of old patterns
+        oldPatterns[voice].append(pattern); // and put it to the end of queue
+        processTextMessage(pattern);
+    } else
+        processTextMessage("random,"+QString::number(voice)); // generate a random pattern
+
 }

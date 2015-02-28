@@ -31,7 +31,7 @@
 				document.getElementById(currentName[voice]).innerHTML = "Nobody";
 				document.getElementById(steps[voice]).innerHTML = "";
 			}
-			if (mess_array[0]==="pattern") {
+			if (mess_array[0].indexOf("pattern")===0) {
 				voice = parseInt(mess_array[2]);
 				var name = mess_array[1];
 				//console.log("Name: ", name)
@@ -66,8 +66,10 @@
   <body style="max-width:600px">
   <h1>Pattern-radio monitor</h1>
   <br>
-  (Explanation.)  Here you can listen to music created by various people.... bla <br>
-  Listen the radio <a href=http://johannes.homeip.net:8000/radio target="_blank">here</a> <br>
+  (Explanation.)  Here you can listen to music created by various people.... bla <br><br><br>
+  Listen the radio here <audio controls src="http://johannes.homeip.net:8000/radio"></audio><br><br>
+  Or open  	
+ <a href=http://johannes.homeip.net:8000/radio target="_blank">this link</a> <br>
   <br>
   <form name="myform">
   <br>

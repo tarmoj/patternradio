@@ -1,10 +1,10 @@
 // main functions for pattergame.html
 
-	var MAX_NOTES = 10, MAX_PITCHES = 10;
+	var MAX_NOTES = 6, MAX_PITCHES = 6;
 	var INACTIVE = 0; ACTIVE = 1;
 	var color = ["darkgreen", "lawngreen"]; 
 	//var value_matrix = []; // values of the notes - []
-	var steps =  [1, 25/21, 9/7, 7/5, 5/3, 9/5, 15/7, 7/3, 25/9, 3/1 ]; // Bohlen-Pierce just //[1, 8/7, 4/3,   14/9,  16/9, 2]; // pseudo slendro // kind of natural:[1,11/10, 5/4, 4/3, 3/2, 7/4,2];
+	var steps =  [1, 8/7, 4/3,   14/9,  16/9, 2];//[1, 25/21, 9/7, 7/5, 5/3, 9/5, 15/7, 7/3, 25/9, 3/1 ]; // Bohlen-Pierce just //[1, 8/7, 4/3,   14/9,  16/9, 2]; // pseudo slendro // kind of natural:[1,11/10, 5/4, 4/3, 3/2, 7/4,2];
 	var baseFrequency = 110; // TODO: sama, mis Csoundi mootoris
 
 // 	function invert(value) {return (value==0) ? 1 : 0;} // since js !(not) operation works only on booleans
@@ -105,8 +105,8 @@
 		// UI values
 		document.getElementById("repeat_label").innerHTML = parseInt(document.getElementById("repeatCount").value)+1;
 		document.getElementById("delay_label").innerHTML = document.getElementById("delay").value;
-		document.myform.mode.value="0";
-		setMode(0);
+		//document.myform.mode.value="0";
+		//setMode(0);
 		drawEverything();
 		
      };
@@ -158,23 +158,7 @@
         
         var layer = new Kinetic.Layer();
         
-        var label1 =  new Kinetic.Text({ x: 4, y: 4,text: "1", fill: 'yellow', fontSize: 24  });
-        layer.add(label1);
-        var label2 =  new Kinetic.Text({ x: stage.getWidth()-20, y: 4,text: "2", fill: 'yellow', fontSize: 24  });
-        layer.add(label2);
-        var label3 =  new Kinetic.Text({ x: 4, y: 150,text: "3", fill: 'yellow', fontSize: 24  });
-        layer.add(label3);
-        var label4 =  new Kinetic.Text({ x: stage.getWidth()-20, y: 150,text: "4", fill: 'yellow', fontSize: 24  });
-        layer.add(label4);
-        var label5 =  new Kinetic.Text({ x: 4, y: 350,text: "5", fill: 'yellow', fontSize: 24  });
-        layer.add(label5);
-        var label6 =  new Kinetic.Text({ x: stage.getWidth()-20, y: 350,text: "6", fill: 'yellow', fontSize: 24  });
-        layer.add(label6);
-        var label7 =  new Kinetic.Text({ x: stage.getWidth()/2+4, y: 4,text: "7", fill: 'yellow', fontSize: 24  });
-        layer.add(label7);
-        var label8 =  new Kinetic.Text({ x: stage.getWidth()/2+4, y: 440,text: "8", fill: 'yellow', fontSize: 24  });
-        layer.add(label8);
-        
+              
         
         
         var border_rect = new Kinetic.Rect({
@@ -262,36 +246,36 @@
       
       
       
-	function setMode(mode) {
-		//var mode = parseInt(document.myform.mode.value);
-		document.myform.mode.value = mode;
-		//document.myform.mode.disabled = true;
-		switch (mode) {
-			case 0:
-				MAX_NOTES = 6;
-				MAX_PITCHES = 6;
-				steps = [1, 8/7, 4/3,   14/9,  16/9, 2];
-				drawEverything();
-				break;
-			case 1: 
-				MAX_NOTES = 8;
-				MAX_PITCHES = 8;
-				steps = [1, 35/32, 5/4, 21/16, 49/32, 105/64, 7/4, 2]; // pelog-harrsion
-				drawEverything();
-				break;
-			case 2:
-				MAX_NOTES = 10;
-				MAX_PITCHES = 10;
-				steps = [1, 25/21, 9/7, 7/5, 5/3, 9/5, 15/7, 7/3, 25/9, 3/1 ]; 
-				drawEverything();
-				break;
-		}
-	}
+// 	function setMode(mode) {
+// 		//var mode = parseInt(document.myform.mode.value);
+// 		document.myform.mode.value = mode;
+// 		//document.myform.mode.disabled = true;
+// 		switch (mode) {
+// 			case 0:
+// 				MAX_NOTES = 6;
+// 				MAX_PITCHES = 6;
+// 				steps = [1, 8/7, 4/3,   14/9,  16/9, 2];
+// 				drawEverything();
+// 				break;
+// 			case 1: 
+// 				MAX_NOTES = 8;
+// 				MAX_PITCHES = 8;
+// 				steps = [1, 35/32, 5/4, 21/16, 49/32, 105/64, 7/4, 2]; // pelog-harrsion
+// 				drawEverything();
+// 				break;
+// 			case 2:
+// 				MAX_NOTES = 10;
+// 				MAX_PITCHES = 10;
+// 				steps = [1, 25/21, 9/7, 7/5, 5/3, 9/5, 15/7, 7/3, 25/9, 3/1 ]; 
+// 				drawEverything();
+// 				break;
+// 		}
+// 	}
 	
 	function openAction() {
 			//only in patterngame:
 			document.myform.sendButton.disabled = false;
-			document.myform.mode.disabled = true; 
+			//document.myform.mode.disabled = true; 
 		};
 	
 	function onMessage(evt)
@@ -300,9 +284,9 @@
 		writeToScreen("Message from server: " + evt.data + '\n');
  		var mess_array = evt.data.split(",");
  		//console.log(mess_array[0]);
- 		if (mess_array[0] == "mode") {	
-			setMode(parseInt(mess_array[1]));
- 		}
+//  		if (mess_array[0] == "mode") {	
+// 			setMode(parseInt(mess_array[1]));
+//  		}
 	}
 	
 	
@@ -313,7 +297,8 @@
 		parameters.push(getRadioValue("octave"));
 		parameters.push(document.myform.repeatCount.value);
 		parameters.push(document.myform.delay.value);
-		parameters.push(getRadioValue("speaker"));
+		//parameters.push(getRadioValue("speaker"));
+		parameters.push("4"); // was for speaker
 		parameters.push("steps:")
 		// add all pitchindexes (either step number of -1 if nunselected
 		for (var i=0;i<MAX_NOTES; i++) {

@@ -120,7 +120,7 @@ void CsEngine::handleMessage(QString message)
 //	qDebug()<<"Message to compile: "<<code;
 //    compileOrc(code);
 
-    // METHOD 2 (compileOrc has now memory leak in Csound) - event and table
+    // METHOD 2 (compileOrc has now memory leak in Csound) - use event and table instead
     //create table and send to Csound
     MYFLT stepArray[16]; // make sure that is is defined in csd with thable number 99
     for (int j=0, i=messageParts.indexOf("steps:")+1 ; i<messageParts.length(); i++, j++ ) { // statements to store steps into 2d array giMartix[voice][step]
