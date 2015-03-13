@@ -160,6 +160,11 @@ instr clockAndChannels
 		chnset  int(random:k(0,5)),"sound3"
 	endif 
 	
+	; this is workaround that someties "actionNeeded" will not be set correcttly an there will be silenceˇ -DEBUG it!
+	ktestTrigger metro 1/60, 0.1
+	schedkwhen ktestTrigger, 0, 1, 4.11, 0, 5,0,1, 0 
+	schedkwhen ktestTrigger, 0.5, 1, 4.22, 0, 5,0,1, 1 
+	schedkwhen ktestTrigger, 1, 1, 4.33, 0, 5,0,1, 2 
 	
 endin
 

@@ -74,6 +74,9 @@
   <form name="myform">
   <br>
   Heart-rate: <span id="heatrate">?</span>
+  <br>
+  <br>
+  <i>NB! Due to buffering, you will hear the patterns in the stream 10..20 seconds later</i><br>
   <br><br>
   Info about playing voices:<br>
    <table border="1" style="width:90%">
@@ -105,7 +108,10 @@
   </tr>
 </table> 
   
-  
+  <br><br>
+  New messages are put into "old-queue" and played back again when their turn comes again.<br>
+
+  TODO: info about old messages (ques of old messages)<br>
   
   Server address: <input value="ws://johannes.homeip.net:10010/ws" id="url" type="text"><br>
     <button type="button" id="connectButton" onclick="doConnect();">Connect</button>
