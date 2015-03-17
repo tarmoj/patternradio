@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 	WsServer *wsServer;
 	wsServer = new WsServer(10010);
 
-    CsEngine cs("/home/tarmo/tarmo/csound/patternradio/patterngame-changetempo.csd"); // TODO: CurrentDir ..//patterngame-changetempo.csd
+    CsEngine cs("../patterngame-changetempo.csd"); // TODO: CurrentDir ..//patterngame-changetempo.csd
 
 	QObject::connect(wsServer,SIGNAL(newMessage(QString)),&cs,SLOT(handleMessage(QString)) );
 	QObject::connect(&cs, SIGNAL(sendNewPattern(int)), wsServer, SLOT(setFreeToPlay(int)));
