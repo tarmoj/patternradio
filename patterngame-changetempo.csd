@@ -1,6 +1,6 @@
 <CsoundSynthesizer>
 <CsOptions>
--d
+-dm0
 -odac:system:playback_ -+rtaudio=jack 
 </CsOptions>
 <CsInstruments>
@@ -12,7 +12,7 @@ ksmps = 32
 
 #define MAXREPETITIONS  #5#
 #define COUNT4LONG #100# ; 100
-#define MAXWAIT #2# ; 10
+#define MAXWAIT #20# ; 10
 
 ;GLOBALS: 
 gkPseudoSlendro[] fillarray  1, 8/7, 4/3,   14/9,  16/9, 2
@@ -161,10 +161,10 @@ instr clockAndChannels
 	endif 
 	
 	; this is workaround that someties "actionNeeded" will not be set correcttly an there will be silenceˇ -DEBUG it!
-	ktestTrigger metro 1/60, 0.1
-	schedkwhen ktestTrigger, 0, 1, 4.11, 0, 5,0,1, 0 
-	schedkwhen ktestTrigger, 0.5, 1, 4.22, 0, 5,0,1, 1 
-	schedkwhen ktestTrigger, 1, 1, 4.33, 0, 5,0,1, 2 
+;	ktestTrigger metro 1/60, 0.1
+;	schedkwhen ktestTrigger, 0, 1, 4.11, 0, 5,0,1, 0 
+;	schedkwhen ktestTrigger, 0.5, 1, 4.22, 0, 5,0,1, 1 
+;	schedkwhen ktestTrigger, 1, 1, 4.33, 0, 5,0,1, 2 
 	
 endin
 

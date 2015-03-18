@@ -23,10 +23,11 @@ WsServer::WsServer(quint16 port, QObject *parent) :
     }
 	patternQue << QStringList() << QStringList()<<QStringList(); // define the list
     oldPatterns << QStringList() << QStringList()<<QStringList();
-    names << QStringList() << QStringList()<<QStringList();
+    //names << QStringList() << QStringList()<<QStringList();
+    //oldNames << QStringList() << QStringList()<<QStringList();
 	freeToPlay<<1<<1<<1;
-    modeNames<<"Slendro"<<"Pelog"<<"Bohlen-Pierce"; // not necessary in radio
-	mode = 0;
+    //modeNames<<"Slendro"<<"Pelog"<<"Bohlen-Pierce"; // not necessary in radio
+    //mode = 0;
     // fill list oldPatterns from log file on startup
     QFile logFile(LOGFILE);
     if (logFile.open(QIODevice::ReadOnly| QIODevice::Text)) {
@@ -89,6 +90,9 @@ void WsServer::processTextMessage(QString message)
 		m_monitors.append(pClient);
 		qDebug()<<"New monitor connected";
 		pClient->sendTextMessage("Hi!");
+        pClient->sendTextMessage("names,0,"+ getNames(0) );
+        pClient->sendTextMessage("names,1,"+ getNames(1) );
+        pClient->sendTextMessage("names,2,"+ getNames(2) );
 	}
 
 	if (message.startsWith("random")) { // create random pattern, add to que format: random,<voice>
@@ -112,19 +116,21 @@ void WsServer::processTextMessage(QString message)
 	if (message.startsWith("pattern")) {
 		int voice = messageParts[2].toInt();
         //TODO: if startswith patternOLD, mark in name OLD
-		patternQue[voice].append(message);
-        QString name = (messageParts[0].contains("OLD")) ? messageParts[1] + " (old)" : messageParts[1]; // DOES NOT WORK YET!
-        names[voice].append(name); // store names to list
+
+
+		QString name = (messageParts[0].contains("OLD")) ? messageParts[1] + " (old)" : messageParts[1];
+        //names[voice].append(name); // store names to list
 		//emit namesChanged(voice, names[voice].join("\n"));
-		sendToMonitors("names,"+messageParts[2]+","+names[voice].join("\n"));
+		// orig: sendToMonitors("names,"+messageParts[2]+","+names[voice].join("\n"));
+        //sendToMonitors("names,"+messageParts[2]+","+names[voice].join("\n") + "\n"+ oldNames[voice].join("\n"));
+
         qDebug()<<"New pattern from "<< name << message;
 		qDebug()<<"Messages in list per voice: "<<voice<<": "<<patternQue[voice].count();
 
-
-        //LOG - append every new pattern to file
-
-        if (!messageParts[0].contains("OLD")) {
-            oldPatterns[voice].append(message);
+		if (!messageParts[0].contains("OLD")) { // if new pattern
+			patternQue[voice].append(message);
+            //oldPatterns[voice].append(message); - after it is played!
+			//oldNames[voice].append(name + " (old)"); // it should be done after the pattern is played, but OK...
             QFile logFile(LOGFILE);
             if (logFile.open(QIODevice::Append)) {
                 logFile.write(QDateTime::currentDateTime().toString("dd.MM.yy hh:mm:ss").toLocal8Bit()+"\n");
@@ -134,6 +140,7 @@ void WsServer::processTextMessage(QString message)
             } else
                 qDebug()<<"Could not open logfile "<<LOGFILE;
         }
+        sendToMonitors("names,"+QString::number(voice)+","+getNames(voice));
 
 		if (freeToPlay[voice]) {
 			sendFirstMessage(voice);
@@ -161,18 +168,10 @@ void WsServer::processTextMessage(QString message)
 
 	} else if (message.startsWith("schedule") || message.contains("init")) { //right now only schedule or init commands are accepted
 		emit newCodeToComplie(message);
-		if (message.contains("setMode"))  {
-				mode = messageParts[3].toInt();
-				emit newMessage("mode,"+modeNames[mode]); // bit cryptic code, should extract the scale and forward to qml
-				foreach (QWebSocket * client, m_clients) {
-					client->sendTextMessage("mode,"+messageParts[3]); // tell the clients about mode change
-				}
-		}
 
 	} else if (message.startsWith("clear")) {
 		int voice = messageParts[1].toInt();
 		patternQue[voice].clear();
-		names[voice].clear();
 		sendFirstMessage(voice); // to emit siganl to qml to clear
 	}
 
@@ -204,7 +203,21 @@ void WsServer::sendToMonitors(QString message)
 {
 	foreach (QWebSocket *socket, m_monitors) {
 		socket->sendTextMessage(message);
-	}
+    }
+}
+
+QString WsServer::getNames(int voice)
+{
+    QString pattern, names = "*** New patterns:\n";
+    foreach (pattern, patternQue[voice]) {
+        names += pattern.split(",")[1] + "\n"; // extract name from pattern
+    }
+    names += "*** Old patterns:\n";
+    foreach (pattern, oldPatterns[voice]) {
+        names += pattern.split(",")[1] + "\n"; // extract name from pattern
+    }
+
+    return names;
 }
 
 
@@ -229,22 +242,31 @@ void WsServer::sendFirstMessage(int voice)
 		qDebug()<<"patternQue: "<<voice<<" Index out of range";
 		return;
 	}
+
+	QString firstMessage;
 	if (patternQue[voice].isEmpty()) {
 		qDebug()<<"patternQue["<<voice<<"] is empty";
 		//emit newMessage("clear,"+QString::number(voice));
 		sendToMonitors("clear,"+QString::number(voice));
-		return;
-	}
+		if (!oldPatterns.isEmpty()) {
+			firstMessage = oldPatterns[voice].takeFirst();
+            //oldPatterns[voice].append(firstMessage); // and put it to the end of queue
+		} else {
+			qDebug()<<"No oldpatterns in que. Is everything OK wit logfile pattern-messages.log?"	;
+			return;
+		}
 
-	QString firstMessage = patternQue[voice].takeFirst();
-	qDebug()<<"Messages in list per voice: "<<voice<<": "<<patternQue[voice].count();
+
+	} else
+		firstMessage = patternQue[voice].takeFirst();
+
+	//qDebug()<<"Messages in list per voice: "<<voice<<": "<<patternQue[voice].count();
 	freeToPlay[voice]=0;
 	emit newMessage(firstMessage);
-	if (!names[voice].isEmpty())
-		names[voice].removeFirst();
-	//emit namesChanged(voice, names[voice].join("\n"));
-	sendToMonitors("names,"+QString::number(voice)+","+names[voice].join("\n"));
-	sendToMonitors(firstMessage);
+
+    sendToMonitors("names,"+QString::number(voice)+","+getNames(voice));
+    sendToMonitors(firstMessage);
+    oldPatterns[voice].append(firstMessage); // and put the pattern to the end of queue
 
 }
 
@@ -258,15 +280,21 @@ void WsServer::setFreeToPlay(int voice)
 void WsServer::cutTheSilence(int voice)  // called when there has been silence for long time in the voice
 {
 	setFreeToPlay(voice); // for any case
-    //
-    if (!oldPatterns[voice].isEmpty()) {
-        QString pattern = oldPatterns[voice].takeFirst();
-        //TODO: somehow add "OLD"
-        if (!pattern.startsWith("patternOLD"))
-            pattern.replace("pattern","patternOLD"); // to signal that it comes from the pool of old patterns
-        oldPatterns[voice].append(pattern); // and put it to the end of queue
-        processTextMessage(pattern);
-    } else
-        processTextMessage("random,"+QString::number(voice)); // generate a random pattern
+	if (oldPatterns[voice].isEmpty())
+		processTextMessage("random,"+QString::number(voice)); // generate a random pattern
+	else
+		sendFirstMessage(voice);
+
+
+		//
+//    if (!oldPatterns[voice].isEmpty()) {
+//        QString pattern = oldPatterns[voice].takeFirst();
+//        //TODO: somehow add "OLD"
+//        if (!pattern.startsWith("patternOLD"))
+//            pattern.replace("pattern","patternOLD"); // to signal that it comes from the pool of old patterns
+//        oldPatterns[voice].append(pattern); // and put it to the end of queue
+//        processTextMessage(pattern);
+//    } else
+//        processTextMessage("random,"+QString::number(voice)); // generate a random pattern
 
 }

@@ -27,7 +27,7 @@
 			}
 			if (mess_array[0] == "clear") {	 // comes in as names,<voice number>, <names separated with \n
 				voice = parseInt(mess_array[1]);
-				document.getElementById(names[voice]).innerHTML=""; //TODO:
+				//document.getElementById(names[voice]).innerHTML=""; // don't erase - probably there ares till ole que visible
 				document.getElementById(currentName[voice]).innerHTML = "Nobody";
 				document.getElementById(steps[voice]).innerHTML = "";
 			}

@@ -48,10 +48,11 @@ private:
     QWebSocketServer *m_pWebSocketServer;
 	QList<QWebSocket *> m_clients, m_monitors;
     QList <QStringList> patternQue, oldPatterns; // verctor of 3 stringlists, one for every voice
-	QList <QStringList> names;
+    //QList <QStringList> names, oldNames;
 	QList <int> freeToPlay;  // flags for voices
-	QStringList modeNames;
+    //QStringList modeNames;
 	void sendToMonitors(QString message);
+    QString getNames(int voice);  // returns names from patternQue and oldPatterns
 
 };
 
