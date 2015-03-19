@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <title>Mustriraadio. Loo meloodia  </title>
+    <meta content="Tarmo Johannes" id="author">
+	
+	<link type="text/css" rel="stylesheet" href="radio.css">
+	
+	<script src="kinetic-v5.1.0.js"></script> <!-- image movement etc-->
+        <script src="ws-functions.js"></script> <!-- websocket functions -->
+	<script defer="defer" src="patterngame-ui.js">	</script>
+  </head>
+  <body>
+	<span style='margin-left:640px'><small><i><a href="radio.html">English</a></i></small></span>
+  <h1>Mustriraadio</h1><br>
+    <i><small>Loodud festivaliks <a href="http://helilooja.ee/emp/"> Eesti Muusika Päevad 2015</a><br>
+	Autor: Tarmo Johannes: tarmo æææ otsakool .  edu . ee<br></small></i><br><br>
+	Kuula mustriraadiot (mängib kõiki saadetud meloodiaid):<br><br>  <audio controls src="http://tarmo.webhop.net:8000/radio"></audio><br><br>
+	<a href=monitor_est.html>Monitor</a> (info hektel mängivate mustrite, järjekordade jms kohta)<br><br>
+	
+	<h2>Loo uus meloodia:</h2>
+	
+	
+    <form name = "myform" onsubmit="return false">
+    Nimi:  <input type="text" id="name" required  style="font-size:16px"></input><br><br>
+	
+    Ulatus/hääl (raadio esitab meloodiaid korraga kolmes hääles):<br> <input value=0 name="octave" type="radio">madal&nbsp;&nbsp; <input
+      checked="checked" value=1 name="octave" type="radio">keskmine&nbsp;&nbsp;
+    <input value=2 name="octave" type="radio">kõrge <br>
+    <br>
+    <br>
+  	Vajutage või klõpsake rohelistele ruutudele, et luua meloodia.<br>
+	Saate ka määrata, kas seda korratakse ja millise aja (mitme ruudu) järel.
+	<br>
+    <div id="container"></div>
+    <br>
+    Mängi meloodia <input type="range" class="range" id="repeatCount" min=0 max=5 step=1 value=0 oninput="repeat_label.value=parseInt(repeatCount.value)+1"
+    onchange="oscil.repeatCount=parseInt(this.value)"> 
+    <output name="repeat_label" for="repeatCount" id="repeat_label">0</output>
+    korda<br><br>
+    Alusta kordamist <input type="range" class="range" id="delay" min=2 max=6 step=1 value=3 onchange="oscil.delay=parseInt(this.value)" oninput="delay_label.value=delay.value"> 
+    <output name="delay_label" for="delay" id="delay_label">4</output> 
+    ruudu järel.
+    <br><br><br>
+    <button type="button" class="button" id="listenButton" onclick="oscil.play()">Kuula</button>  
+    <button type="submit" class="button" id="sendButton" onclick="sendEvent()" disabled="true">Saada serverisse</button>
+    <br>
+    <br>
+    <br>
+    
+	Serveri aadress: <input value="ws://tarmo.webhop.net:10010/ws" id="url" type="text"><br>
+    <button type="button" id="connectButton" onclick="doConnect();">Ühenda</button>
+    <br>
+    <br>
+    <p><textarea id="outputtext" rows="5" cols="30" readonly></textarea> </p>
+   
+	</form>
+   
+   
+  </body>
+</html>

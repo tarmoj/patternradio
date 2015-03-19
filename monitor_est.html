@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mustriraadio monitor</title>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <meta content="Tarmo Johannes" id="author">
+<!--	<link type="text/css" rel="stylesheet" href="radio.css">-->
+    
+    <style></style>
+    
+    <script src="ws-functions.js"></script>
+    <script>
+    
+		function onMessage(evt)
+		{
+			writeToScreen("Message from server: " + evt.data + '\n');
+			var mess_array = evt.data.split(",");
+			console.log(mess_array[0]);
+			var currentName = ["currentLow","currentMedium","currentHigh"];
+			var names = ["lownames","mediumnames","highnames"];
+			var steps = ["lowsteps", "mediumsteps", "highsteps"];
+			var voice;
+			if (mess_array[0] == "names") {	 // comes in as names,<voice number>, <names separated with \n
+				voice = parseInt(mess_array[1]);
+				console.log("voice",voice,"id:",names[voice],mess_array[2]);
+				document.getElementById(names[voice]).innerHTML = mess_array[2];
+				
+			}
+			if (mess_array[0] == "clear") {	 // comes in as names,<voice number>, <names separated with \n
+				voice = parseInt(mess_array[1]);
+				//document.getElementById(names[voice]).innerHTML=""; // don't erase - probably there ares till ole que visible
+				document.getElementById(currentName[voice]).innerHTML = "Nobody";
+				document.getElementById(steps[voice]).innerHTML = "";
+			}
+			if (mess_array[0].indexOf("pattern")===0) {
+				voice = parseInt(mess_array[2]);
+				var name = mess_array[1];
+				//console.log("Name: ", name)
+				document.getElementById(currentName[voice]).innerHTML = name;
+				var stepString = mess_array.slice(mess_array.indexOf("steps:")+1);
+				document.getElementById(steps[voice]).innerHTML = stepString;
+				// TODO: function setSteps(voice, stepsArray) ;
+			}
+			if (mess_array[0]== "count") {
+				document.getElementById("patternsCount").innerHTML = mess_array[1];
+			}
+					
+		}
+    
+		
+    
+		function openAction() {
+			console.log("sending monitor");
+			doSend("monitor");
+		};
+		
+		window.onload = function() {
+			doConnect();
+		};
+	
+		
+	
+    </script>
+    
+    
+    
+  </head>
+  <body style="max-width:800px; margin-left: 3%;">
+<span style='margin-left:640px'><small><i><a href="monitor.html">English</a></i></small></span>  
+<h1>Mustriraadio monitor</h1>
+  <br>
+  <i><small>Loodud <a href="http://helilooja.ee/emp/"> Eesti Muusika Päevadeks 2015</a><br>
+	Autor: Tarmo Johannes: tarmo æææ otsakool .  edu . ee<br></small></i>
+  <br>
+	
+  Siin saate kuulata muusikat, millesse on andnud oma panuse paljud inimesed. Igaüks komponeeris väikese meloodia ja saatis selle serverisse esitamiseks. Kõiki meloodiaid mängitakse järjekorras uuesti ja uuesti.<br>
+  Uue meloodia saate luua <a href=radio_est.html>siin</a>.<br>
+  Server muudab aeg-ajalt meloodiate mahamängimise heli tüüpi ning "ruutude" (meloodia nootide) suhtelist pikkust, et tagada suuremat vaheldusrikkust.<br>
+  Üldine tempo sõltub Tarmo Johannese südame pulsist, mis saadetakse serverile reaalajas. [HETKEL VEEL REALISEERIMATA].<br>
+  Veebiraadio kulmineerub Tarmo Johannese kontsertdil <a href=https://www.facebook.com/events/342288022643213/>PASSAGGIO</a> EMP15 raames <b>N 16.04.15 kl 19  Salme Kultuurikeskuses.</b><br>
+  <br><br>
+  Kuulake raadiot siin <audio controls src="http://tarmo.webhop.net:8000/radio"></audio><br><br>
+  Või avage   	
+ <a href=http://tarmo.webhop.net:8000/radio target="_blank">see link</a> <br>
+  <br>
+  <form name="myform">
+  <br>
+  TJ hetke pulss: <span id="heatrate">?</span> [VEEL REALISEERIMATA].
+  <br>
+  <br>
+  <i>NB! Et internetiraadio saaks mängida sujuvalt, vajab ta vahepuhvrite täitmist, ning paraku kuulete siin kuvatud mustreid 10..20 sekundit hiljem.</i><br>
+  <br>
+  Kokku saadetud mustreid: <span id="patternsCount">?</span>. Aitäh!<br>
+
+  <br>
+  Info mustritesthäälte kaupa:<br>
+   <table border="1" style="width:90%">
+  <tr>
+    <td>Madal</td>
+    <td>Keskmine</td>
+    <td>Kõrge</td>
+  </tr>
+  <tr>
+    <td>
+    Hetkel mängib: <span id="currentLow">Mitte keegi</span><br>
+	Astmed [hiljem: pilt]: <span id="lowsteps"></span><br>
+	Järjekorras ootel:<br>
+	<textarea id="lownames" rows="8" readonly></textarea><br><br>
+    
+    </td>
+    <td>
+     Hetkel mängib: <span id="currentLow">Mitte keegi</span><br>
+	Astmed [hiljem: pilt]: <span id="lowsteps"></span><br>
+	Järjekorras ootel:<br>
+	<textarea id="mediumnames" rows="8" readonly></textarea><br><br>
+    </td>
+    <td>
+    Hetkel mängib: <span id="currentLow">Mitte keegi</span><br>
+	Astmed [hiljem: pilt]: <span id="lowsteps"></span><br>
+	Järjekorras ootel:<br>
+	<textarea id="highnames" rows="8" readonly></textarea><br><br>
+    </td>
+  </tr>
+</table> 
+  
+  <br><br>
+  <br>
+  
+  Serveri address: <input value="ws://tarmo.webhop.net:10010/ws" id="url" type="text"><br>
+    <button type="button" id="connectButton" onclick="doConnect();">Ühenda</button>
+    <br>
+    <br>
+    <p><textarea id="outputtext" rows="5" cols="30" readonly></textarea> </p>
+  </form>
+  
+  
+  
+  </body>
+</html>
