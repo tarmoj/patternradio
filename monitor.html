@@ -4,6 +4,7 @@
     <title>Pattern-radio monitor</title>
     <meta content="text/html; charset=utf-8" http-equiv="content-type">
     <meta content="Tarmo Johannes" id="author">
+<!--	<link type="text/css" rel="stylesheet" href="radio.css">-->
     
     <style></style>
     
@@ -39,10 +40,11 @@
 				var stepString = mess_array.slice(mess_array.indexOf("steps:")+1);
 				document.getElementById(steps[voice]).innerHTML = stepString;
 				// TODO: function setSteps(voice, stepsArray) ;
-				
-				//var speaker = mess_array[5];
-				//patternRects.itemAt(voice).speaker = parseInt(speaker);
 			}
+			if (mess_array[0]== "count") {
+				document.getElementById("patternsCount").innerHTML = mess_array[1];
+			}
+					
 		}
     
 		
@@ -63,21 +65,34 @@
     
     
   </head>
-  <body style="max-width:600px">
+  <body style="max-width:800px; margin-left: 3%;">
+  <span style='margin-left:640px'><small><i><a href="monitor_est.html">Eesti</a></i></small></span>
   <h1>Pattern-radio monitor</h1>
   <br>
-  (Explanation.)  Here you can listen to music created by various people.... bla <br><br><br>
-  Listen the radio here <audio controls src="http://johannes.homeip.net:8000/radio"></audio><br><br>
+  <i><small>Developed as an interactive web-radio for <a href="http://helilooja.ee/emp/en"> Estonian Music Days 2015</a><br>
+	by Tarmo Johannes: tarmo æææ otsakool .  edu . ee<br></small></i>
+  <br>
+	
+  Here you can listen to music created by various people. Everybody has made a small melody and sent it to the server to play. All melodies are repeated again and again in turn.<br>
+  You can compose a new melody <a href=radio.html>here</a>.<br>
+  The pattern-radio will climax and end in the beginning of Tarmo Johannes's concert <a href=https://www.facebook.com/events/342288022643213/>PASSAGGIO</a>,  Estoniam Music Days 2015, <b>Thu 16.04.15 at 7pm, Salme Cultural Centre.</b><br>
+  The server changes the sounds and realtive durations of the "squares" (notes) for greater variety after every now and then.<br>
+  The speed of the playback depends on the heart-rate of Tarmo Johannes, sent to the server in real-time. [NOT IMPLEMENTED YET].
+  <br><br>
+  Listen the radio here <audio controls src="http://tarmo.webhop.net:8000/radio"></audio><br><br>
   Or open  	
- <a href=http://johannes.homeip.net:8000/radio target="_blank">this link</a> <br>
+ <a href=http://tarmo.webhop.net:8000/radio target="_blank">this link</a> <br>
   <br>
   <form name="myform">
   <br>
-  Heart-rate: <span id="heatrate">?</span>
+  Heart-rate: <span id="heatrate">?</span> [NOT IMPLEMENTED YET].
   <br>
   <br>
   <i>NB! Due to buffering, you will hear the patterns in the stream 10..20 seconds later</i><br>
-  <br><br>
+  <br>
+  Patterns submitted: <span id="patternsCount">?</span>. Thank you!<br>
+
+  <br>
   Info about playing voices:<br>
    <table border="1" style="width:90%">
   <tr>
@@ -109,11 +124,9 @@
 </table> 
   
   <br><br>
-  New messages are put into "old-queue" and played back again when their turn comes again.<br>
-
-  TODO: info about old messages (ques of old messages)<br>
+  <br>
   
-  Server address: <input value="ws://johannes.homeip.net:10010/ws" id="url" type="text"><br>
+  Server address: <input value="ws://tarmo.webhop.net:10010/ws" id="url" type="text"><br>
     <button type="button" id="connectButton" onclick="doConnect();">Connect</button>
     <br>
     <br>

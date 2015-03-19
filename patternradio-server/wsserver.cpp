@@ -41,6 +41,7 @@ WsServer::WsServer(quint16 port, QObject *parent) :
             line = in.readLine().simplified();
         }
         logFile.close();
+        qDebug()<<"Loaded " <<getPatternsCount() << "old patterns.";
     } else
         qDebug()<<"Could not open logfile "<<LOGFILE;
 }
@@ -64,7 +65,6 @@ void WsServer::onNewConnection()
     m_clients << pSocket;
     emit newConnection(m_clients.count());
 	qDebug()<<"New connection, clients count: "<< m_clients.count();
-	pSocket->sendTextMessage("mode,"+QString::number(mode)); // to set the active mode on connect
 }
 
 int randInt(int low, int high) {
@@ -93,6 +93,7 @@ void WsServer::processTextMessage(QString message)
         pClient->sendTextMessage("names,0,"+ getNames(0) );
         pClient->sendTextMessage("names,1,"+ getNames(1) );
         pClient->sendTextMessage("names,2,"+ getNames(2) );
+        pClient->sendTextMessage("count,"+QString::number(getPatternsCount()));
 	}
 
 	if (message.startsWith("random")) { // create random pattern, add to que format: random,<voice>
@@ -145,6 +146,7 @@ void WsServer::processTextMessage(QString message)
 		if (freeToPlay[voice]) {
 			sendFirstMessage(voice);
 		}
+        sendToMonitors("count,"+QString::number(getPatternsCount()));
 
 	} else 	if (message.startsWith("new")) { // for testing only. send message from js console of browser wit doSend("new 1") or similar
 		int voice = messageParts[1].toInt();
@@ -218,6 +220,14 @@ QString WsServer::getNames(int voice)
     }
 
     return names;
+}
+
+int WsServer::getPatternsCount()
+{
+    int patternsCount =  patternQue[0].count() + patternQue[1].count() + patternQue[2].count() +
+            oldPatterns[0].count() + oldPatterns[1].count() + oldPatterns[2].count() ;
+
+    return patternsCount;
 }
 
 

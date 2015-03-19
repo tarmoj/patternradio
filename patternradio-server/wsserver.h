@@ -53,7 +53,7 @@ private:
     //QStringList modeNames;
 	void sendToMonitors(QString message);
     QString getNames(int voice);  // returns names from patternQue and oldPatterns
-
+    int getPatternsCount(); // return how many patterns are submitted
 };
 
 

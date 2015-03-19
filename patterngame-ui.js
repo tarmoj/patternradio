@@ -292,6 +292,10 @@
 	
 	function sendEvent() {
 		// message format: 'pattern' name voice repeatNtimes afterNsquares  speaker/pan steps: pitch_index11 pitch_index2 etc
+		if (document.myform.name.value.trim().length==0) {
+			alert("Please fill in your name");
+			return;
+		}
 		var parameters = ['pattern'];
 		parameters.push(document.myform.name.value); // TODO: check if there is comma, either split in server may not work
 		parameters.push(getRadioValue("octave"));
@@ -301,13 +305,24 @@
 		parameters.push("4"); // was for speaker
 		parameters.push("steps:")
 		// add all pitchindexes (either step number of -1 if nunselected
+		var allEmpty = true;
 		for (var i=0;i<MAX_NOTES; i++) {
-				parameters.push(oscil.getPitchIndex(i));
+				var pitchIndex = oscil.getPitchIndex(i); 
+				parameters.push(pitchIndex);
+				if (pitchIndex>=0)
+					allEmpty=false;
 		}
+		
+		if (allEmpty) {
+				alert("All columns are empty!\nUse at least one note for the melody!");
+				return;
+		}
+		
 		
 		var messageString = parameters.join(","); // join with comma
 		console.log("To be sent: ",messageString)
 		doSend(messageString);
+		alert("Thank you for submitting your melody!\nIt will be played soon in the radio and played again and again in turn with all the other melodies sent.\nHave a look at the monitor page to check out the queues and currently playing melodies.");
 		myform.sendButton.disabled = true;
 		setTimeout(function(){ myform.sendButton.disabled = false;},2000);
 	}
