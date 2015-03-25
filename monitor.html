@@ -44,6 +44,14 @@
 			if (mess_array[0]== "count") {
 				document.getElementById("patternsCount").innerHTML = mess_array[1];
 			}
+			if (mess_array[0]== "heart") {
+				var output;
+				if (mess_array[1]=="-1") 
+					output = "No signal from heart-rate monitor. Probably Tarmo took the belt off.";
+				else
+					output = mess_array[1];
+				document.getElementById("heartrate").innerHTML = output;
+			}
 					
 		}
     
@@ -77,7 +85,7 @@
   You can compose a new melody <a href=radio.html>here</a>.<br>
   The pattern-radio will climax and end in the beginning of Tarmo Johannes's concert <a href=https://www.facebook.com/events/342288022643213/>PASSAGGIO</a>,  Estoniam Music Days 2015, <b>Thu 16.04.15 at 7pm, Salme Cultural Centre.</b><br>
   The server changes the sounds and realtive durations of the "squares" (notes) for greater variety after every now and then.<br>
-  The speed of the playback depends on the heart-rate of Tarmo Johannes, sent to the server in real-time. [NOT IMPLEMENTED YET].
+  The speed of the playback depends on the heart-rate of Tarmo Johannes, sent to the server in real-time.
   <br><br>
   Listen the radio here <audio controls src="http://tarmo.webhop.net:8000/radio"></audio><br><br>
   Or open  	
@@ -85,7 +93,7 @@
   <br>
   <form name="myform">
   <br>
-  Heart-rate: <span id="heatrate">?</span> [NOT IMPLEMENTED YET].
+  Heart-rate: <span id="heartrate">?</span>
   <br>
   <br>
   <i>NB! Due to buffering, you will hear the patterns in the stream 10..20 seconds later</i><br>
@@ -103,22 +111,22 @@
   <tr>
     <td>
     Currently playing: <span id="currentLow">Nobody</span><br>
-	Steps: <span id="lowsteps"></span><br>
+	Steps:<br> <span id="lowsteps"></span><br>
 	Names in queue:<br>
-	<textarea id="lownames" rows="8" readonly></textarea><br><br>
+	<textarea id="lownames" rows="15" readonly></textarea><br><br>
     
     </td>
     <td>
     Currently playing: <span id="currentMedium">Nobody</span><br>
-	Steps: <span id="mediumsteps"></span><br>
+	Steps:<br> <span id="mediumsteps"></span><br>
 	Names in queue:<br>
-	<textarea id="mediumnames" rows="8" readonly></textarea><br><br>
+	<textarea id="mediumnames" rows="15" readonly></textarea><br><br>
     </td>
     <td>
     Currently playing: <span id="currentHigh">Nobody</span><br>
-	Steps: <span id="highsteps"></span><br>
+	Steps:<br> <span id="highsteps"></span><br>
 	Names in queue:<br>
-	<textarea id="highnames" rows="8" readonly></textarea><br><br>
+	<textarea id="highnames" rows="15" readonly></textarea><br><br>
     </td>
   </tr>
 </table> 
@@ -126,7 +134,7 @@
   <br><br>
   <br>
   
-  Server address: <input value="ws://tarmo.webhop.net:10010/ws" id="url" type="text"><br>
+  Server address: <input value="ws://loclahost:10010/ws" id="url" type="text"><br>
     <button type="button" id="connectButton" onclick="doConnect();">Connect</button>
     <br>
     <br>

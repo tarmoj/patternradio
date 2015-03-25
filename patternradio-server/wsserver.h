@@ -25,6 +25,7 @@ public:
 public Q_SLOTS:
 	void setFreeToPlay(int voice);
 	void cutTheSilence(int voice);
+	void sendToMonitors(QString message);
 
 Q_SIGNALS:
     void closed();
@@ -51,7 +52,7 @@ private:
     //QList <QStringList> names, oldNames;
 	QList <int> freeToPlay;  // flags for voices
     //QStringList modeNames;
-	void sendToMonitors(QString message);
+
     QString getNames(int voice);  // returns names from patternQue and oldPatterns
     int getPatternsCount(); // return how many patterns are submitted
 };

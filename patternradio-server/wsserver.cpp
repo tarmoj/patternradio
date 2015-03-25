@@ -132,15 +132,15 @@ void WsServer::processTextMessage(QString message)
 			patternQue[voice].append(message);
             //oldPatterns[voice].append(message); - after it is played!
 			//oldNames[voice].append(name + " (old)"); // it should be done after the pattern is played, but OK...
-            QFile logFile(LOGFILE);
-            if (logFile.open(QIODevice::Append)) {
-                logFile.write(QDateTime::currentDateTime().toString("dd.MM.yy hh:mm:ss").toLocal8Bit()+"\n");
-                //TODO: add country from IP
-                logFile.write("\t"+message.toLocal8Bit()+"\n");
-                logFile.close();
-            } else
-                qDebug()<<"Could not open logfile "<<LOGFILE;
-        }
+			QFile logFile(LOGFILE);
+			if (logFile.open(QIODevice::Append)) {
+				logFile.write(QDateTime::currentDateTime().toString("dd.MM.yy hh:mm:ss").toLocal8Bit()+"\n");
+				//TODO: add country from IP
+				logFile.write("\t"+message.toLocal8Bit()+"\n");
+				logFile.close();
+			} else
+				qDebug()<<"Could not open logfile "<<LOGFILE;
+		}
         sendToMonitors("names,"+QString::number(voice)+","+getNames(voice));
 
 		if (freeToPlay[voice]) {

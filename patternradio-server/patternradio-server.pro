@@ -17,10 +17,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     csengine.cpp \
-    wsserver.cpp
+    wsserver.cpp \
+    udplistener.cpp
 
 HEADERS += \
     csengine.h \
-    wsserver.h
+    wsserver.h \
+    udplistener.h
 
 LIBS += -lcsound64  -lcsnd6
