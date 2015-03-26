@@ -28,7 +28,8 @@ WsServer::WsServer(quint16 port, QObject *parent) :
 	freeToPlay<<1<<1<<1;
     //modeNames<<"Slendro"<<"Pelog"<<"Bohlen-Pierce"; // not necessary in radio
     //mode = 0;
-    // fill list oldPatterns from log file on startup
+    heartRate = -1;
+	// fill list oldPatterns from log file on startup
     QFile logFile(LOGFILE);
     if (logFile.open(QIODevice::ReadOnly| QIODevice::Text)) {
         QTextStream in(&logFile);
@@ -94,6 +95,7 @@ void WsServer::processTextMessage(QString message)
         pClient->sendTextMessage("names,1,"+ getNames(1) );
         pClient->sendTextMessage("names,2,"+ getNames(2) );
         pClient->sendTextMessage("count,"+QString::number(getPatternsCount()));
+		pClient->sendTextMessage("heart,"+ QString::number(heartRate) );
 	}
 
 	if (message.startsWith("random")) { // create random pattern, add to que format: random,<voice>
@@ -206,6 +208,8 @@ void WsServer::sendToMonitors(QString message)
 	foreach (QWebSocket *socket, m_monitors) {
 		socket->sendTextMessage(message);
     }
+    if (message.startsWith("heart")) // store to send to new monitor connections
+        heartRate = message.split(",")[1].toInt();
 }
 
 QString WsServer::getNames(int voice)

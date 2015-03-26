@@ -210,7 +210,7 @@ instr playPattern
 			;printk2 kfreq
 			;print istep,ifreq
 			;TODO: make amp lesser for every next repetition
-			event "i","sound", 0, gkSquareDuration[ivoice], 0.2*ampdbfs(-6*ivisit) ,kfreq , ivoice 
+			event "i","sound", 0, gkSquareDuration[ivoice], 0.15*ampdbfs(-6*ivisit) ,kfreq , ivoice
 		endif
 		kcounter += 1
 		;printk2 kcounter
@@ -288,13 +288,13 @@ giSample ftgen 0,0,0,1, "tongueram.wav",0,0,1
 instr heartbeat	
 	irvbtime = 4.5
 	p3 += irvbtime
-	aenv linen 0.1,0.01,p3,0.05
-	asig loscil aenv, random:i(0.98,1.0),giSample,1
+	aenv linen 0.3,0.01,p3,0.05
+	asig loscil aenv, random:i(0.98,1.02),giSample,1
 	asig butterlp asig, random:i(500,2000)
 	
 	arev reverb2 asig*0.02, irvbtime, 0.3 
 	
-	aout ntrpol asig, arev, 0.6
+	aout ntrpol asig, arev, 0.8
 	outs aout, aout
 endin
 

@@ -45,7 +45,7 @@ private Q_SLOTS:
 
 
 private:
-    int mode;
+    int mode, heartRate;
     QWebSocketServer *m_pWebSocketServer;
 	QList<QWebSocket *> m_clients, m_monitors;
     QList <QStringList> patternQue, oldPatterns; // verctor of 3 stringlists, one for every voice

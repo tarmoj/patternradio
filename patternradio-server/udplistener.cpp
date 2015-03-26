@@ -31,7 +31,7 @@ void UdpListener::readyRead()
 		 emit newHeartRate("heart,"+heartRate);
 		 QFile logFile(LOGFILE); // log heartrate into logfile
 		 if (logFile.open(QIODevice::Append)) {
-			 logFile.write((QDateTime::currentDateTime().toString("dd.MM.yy hh:mm:ss")+","+heartRate).toLocal8Bit());
+			 logFile.write((QDateTime::currentDateTime().toString("dd.MM.yy hh:mm:ss")+","+heartRate).toLocal8Bit()+"\n");
 			 logFile.close();
 		 } else
 			 qDebug()<<"Could not open logfile "<<LOGFILE;
