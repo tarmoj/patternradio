@@ -104,10 +104,20 @@ void CsEngine::handleMessage(QString message)
 		return;
 	}
 	QStringList messageParts = message.split(",");
+
+	if (message.startsWith("heart")) {
+		double heartRate =  (messageParts[1]=="-1") ? 60 : messageParts[1].toDouble(); // if value is -1 (no signal from HR monitor, set to 60 )
+		setChannel("heartrate",heartRate);
+		return;
+	}
+
+	// otherwise pattern message:
 	QString voice = messageParts[2];
 	QString repeatNtimes = messageParts[3];
 	QString afterNSquares = messageParts[4];
 	QString panOrSpeaker = messageParts[5];
+
+
 
     // prepare steps for compileOrc:
 //	QString code = "";

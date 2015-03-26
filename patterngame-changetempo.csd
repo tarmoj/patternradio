@@ -63,6 +63,7 @@ chnset 0.25, "square1"
 chnset 0.25, "square2"
 chnset 0.25, "square3"
 chnset 0, "actionNeeded" ; singals that a voice has beeb silent for long time and needs a new random pattern
+chnset 60, "heartrate"
 ;
 
 seed 0
@@ -115,14 +116,17 @@ instr clockAndChannels
 	;gkTempo chnget "tempo" ; 1 - normal, <1 - slower, >1 - faster
 	gkLevel chnget "level"
 	
-	gkTempo = 1;1+chnget:k("heartrate")/60 ; 1- neutral, <1 - slower >1 - faster
-	;printk2 gkTempo
+	gkTempo = 0.01 + chnget:k("heartrate")/60 ; 80- neutral, <80 - slower >1 - faster
+	printk2 gkTempo
+	
+	kheartbeat metro gkTempo
+	schedkwhen kheartbeat, 0, 0, "heartbeat", 0, filelen("tongueram.wav")
 	
 	gkSoundType[0] chnget "sound1" 
 	gkSoundType[1] chnget "sound2"
 	gkSoundType[2] chnget "sound3"
 	
-	if (metro(2)==1) then ; allow square duration changes only "on tick"	
+	if (metro(1)==1) then ; allow square duration changes only "on tick"	
 		gkSquareDuration[0] chnget "square1"
 		gkSquareDuration[1] chnget "square2"
 		gkSquareDuration[2] chnget "square3"
@@ -150,15 +154,17 @@ instr clockAndChannels
 	
 	; changes to sounds and durations
 	if (metro(1/30,0.1)==1) then
-		chnset  int(random:k(1,6))*0.15, "square1"
-		chnset  int(random:k(1,4))*0.15, "square2"
-		chnset  int(random:k(1,4))*0.15, "square3"	
+		chnset  int(random:k(1,6))*0.2, "square1"
+		chnset  int(random:k(1,6))*0.2, "square2"
+		chnset  int(random:k(1,6))*0.2, "square3"	
 	endif 
 	if (metro(1/20,2.2)==1) then
-		chnset  int(random:k(0,5)),"sound1"
-		chnset  int(random:k(0,5)),"sound2"
-		chnset  int(random:k(0,5)),"sound3"
+		chnset  int(random:k(0,6)),"sound1"
+		chnset  int(random:k(0,6)),"sound2"
+		chnset  int(random:k(0,6)),"sound3"
 	endif 
+	
+	
 	
 	; this is workaround that someties "actionNeeded" will not be set correcttly an there will be silenceˇ -DEBUG it!
 ;	ktestTrigger metro 1/60, 0.1
@@ -277,6 +283,20 @@ instr sound
 	;gaSignal[ivoice] = gaSignal[ivoice] + asig
 endin
 
+giSample ftgen 0,0,0,1, "tongueram.wav",0,0,1
+
+instr heartbeat	
+	irvbtime = 4.5
+	p3 += irvbtime
+	aenv linen 0.1,0.01,p3,0.05
+	asig loscil aenv, random:i(0.98,1.0),giSample,1
+	asig butterlp asig, random:i(500,2000)
+	
+	arev reverb2 asig*0.02, irvbtime, 0.3 
+	
+	aout ntrpol asig, arev, 0.6
+	outs aout, aout
+endin
 
 
 
@@ -329,7 +349,7 @@ endin
   <visible>true</visible>
   <midichan>0</midichan>
   <midicc>0</midicc>
-  <label>12.000</label>
+  <label>0.000</label>
   <alignment>left</alignment>
   <font>Liberation Sans</font>
   <fontsize>10</fontsize>
@@ -413,7 +433,7 @@ endin
   <minimum>0</minimum>
   <maximum>2</maximum>
   <randomizable group="0">false</randomizable>
-  <value>2</value>
+  <value>0</value>
  </bsbObject>
  <bsbObject version="2" type="BSBHSlider">
   <objectName>meditation</objectName>
@@ -615,7 +635,7 @@ endin
   <midicc>0</midicc>
   <minimum>40.00000000</minimum>
   <maximum>120.00000000</maximum>
-  <value>52.30769231</value>
+  <value>84.44400000</value>
   <mode>lin</mode>
   <mouseControl act="jump">continuous</mouseControl>
   <resolution>-1.00000000</resolution>
@@ -661,7 +681,7 @@ endin
   <visible>true</visible>
   <midichan>0</midichan>
   <midicc>0</midicc>
-  <label>52.308</label>
+  <label>84.444</label>
   <alignment>left</alignment>
   <font>Liberation Sans</font>
   <fontsize>10</fontsize>
