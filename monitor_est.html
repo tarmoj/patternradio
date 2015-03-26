@@ -44,6 +44,14 @@
 			if (mess_array[0]== "count") {
 				document.getElementById("patternsCount").innerHTML = mess_array[1];
 			}
+			if (mess_array[0]== "heart") {
+				var output;
+				if (mess_array[1]=="-1") 
+					output = "Signaal puudub. Tõenäoliselt võttis Tarmo anduri lihtsalt maha.";
+				else
+					output = mess_array[1];
+				document.getElementById("heartrate").innerHTML = output;
+			}
 					
 		}
     
@@ -76,7 +84,7 @@
   Siin saate kuulata muusikat, millesse on andnud oma panuse paljud inimesed. Igaüks komponeeris väikese meloodia ja saatis selle serverisse esitamiseks. Kõiki meloodiaid mängitakse järjekorras uuesti ja uuesti.<br>
   Uue meloodia saate luua <a href=radio_est.html>siin</a>.<br>
   Server muudab aeg-ajalt meloodiate mahamängimise heli tüüpi ning "ruutude" (meloodia nootide) suhtelist pikkust, et tagada suuremat vaheldusrikkust.<br>
-  Üldine tempo sõltub Tarmo Johannese südame pulsist, mis saadetakse serverile reaalajas. [HETKEL VEEL REALISEERIMATA].<br>
+  Üldine tempo sõltub Tarmo Johannese südame pulsist, mis saadetakse serverile reaalajas.<br>
   Veebiraadio kulmineerub Tarmo Johannese kontsertdil <a href=https://www.facebook.com/events/342288022643213/>PASSAGGIO</a> EMP15 raames <b>N 16.04.15 kl 19  Salme Kultuurikeskuses.</b><br>
   <br><br>
   Kuulake raadiot siin <audio controls src="http://tarmo.webhop.net:8000/radio"></audio><br><br>
@@ -85,10 +93,10 @@
   <br>
   <form name="myform">
   <br>
-  TJ hetke pulss: <span id="heatrate">?</span> [VEEL REALISEERIMATA].
+  TJ hetke pulss: <b><span style="" id="heartrate">?</span> </b>
   <br>
   <br>
-  <i>NB! Et internetiraadio saaks mängida sujuvalt, vajab ta vahepuhvrite täitmist, ning paraku kuulete siin kuvatud mustreid 10..20 sekundit hiljem.</i><br>
+  <i>NB! Et internetiraadio saaks mängida sujuvalt, vajab ta vahepuhvrite täitmist, ning paraku kuulete siin kuvatud mustreid ja pulsimuutusi 10..20 sekundit hiljem.</i><br>
   <br>
   Kokku saadetud mustreid: <span id="patternsCount">?</span>. Aitäh!<br>
 
