@@ -115,7 +115,7 @@ void CsEngine::handleMessage(QString message)
 	QString voice = messageParts[2];
 	QString repeatNtimes = messageParts[3];
 	QString afterNSquares = messageParts[4];
-	QString panOrSpeaker = messageParts[5];
+	QString panOrSpeaker = "0"; // to make it take random pan in csd//messageParts[5];
 
 
 

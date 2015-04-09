@@ -27,7 +27,7 @@ giSteps3  ftgen 92,0,16, -2,0
 
 gkSteps  = gkPseudoSlendro ;gkBohlenJust ;gkPelogHarrison; 
 gkTempo init 1
-giBaseFrequency = 110 ;cpspch(5.02)
+gkBaseFrequency init 110 ;cpspch(5.02)
 
 giPatternLength = 6;7 ; check taht would be same as in html interface
 gimaxPitches  lenarray  gkSteps
@@ -64,6 +64,7 @@ chnset 0.25, "square2"
 chnset 0.25, "square3"
 chnset 0, "actionNeeded" ; singals that a voice has beeb silent for long time and needs a new random pattern
 chnset 60, "heartrate"
+chnset 0.5, "heartvolume"
 ;
 
 seed 0
@@ -116,7 +117,7 @@ instr clockAndChannels
 	;gkTempo chnget "tempo" ; 1 - normal, <1 - slower, >1 - faster
 	gkLevel chnget "level"
 	
-	gkTempo = 0.01 + chnget:k("heartrate")/60 ; 80- neutral, <80 - slower >1 - faster
+	gkTempo = 0.01 + chnget:k("heartrate")/60 
 	printk2 gkTempo
 	
 	kheartbeat metro gkTempo
@@ -154,16 +155,19 @@ instr clockAndChannels
 	
 	; changes to sounds and durations
 	if (metro(1/30,0.1)==1) then
-		chnset  int(random:k(1,6))*0.2, "square1"
-		chnset  int(random:k(1,6))*0.2, "square2"
-		chnset  int(random:k(1,6))*0.2, "square3"	
+		chnset  int(random:k(1,5))*0.2, "square1"
+		chnset  int(random:k(1,5))*0.2, "square2"
+		chnset  int(random:k(1,5))*0.2, "square3"	
 	endif 
 	if (metro(1/20,2.2)==1) then
-		chnset  int(random:k(0,6)),"sound1"
-		chnset  int(random:k(0,6)),"sound2"
-		chnset  int(random:k(0,6)),"sound3"
+		chnset  int(random:k(0,8)),"sound1"
+		chnset  int(random:k(0,8)),"sound2"
+		chnset  int(random:k(0,8)),"sound3"
 	endif 
 	
+	if (metro(1/300)==1) then ; after every 5 minutes take a new base frequency
+		gkBaseFrequency = int(random:k(80,160)) 
+	endif
 	
 	
 	; this is workaround that someties "actionNeeded" will not be set correcttly an there will be silenceˇ -DEBUG it!
@@ -184,7 +188,7 @@ instr playPattern
 	itimes = p4 ; how many times to repeat: 1 means original + 1 repetition
 	irepeatAfter = p5 ; repeat after given squareDurations
 	ivoice = p6 ; three voices
-	ipanOrSpeaker = (p7==0) ? int(random:i(1,7)) : p7; number of speaker if 8 channels, otherwise expresse pan 1-left, 8- right; TODO - muuda
+	ipanOrSpeaker = (p7==0) ? random:i(0.1,0.9) : p7; number of speaker if 8 channels, otherwise expresse pan 1-left, 8- right; TODO - muuda
 	ivisit = p8 ; 0 when original, 1 when first repetition etc
 	;itotalTime = giPatternLength*i(gkSquareDuration[ivoice]) + itimes*irepeatAfter*i(gkSquareDuration[ivoice])+1
 	p3 = giPatternLength * i(gkSquareDuration[ivoice])*2 ; for any case, when tempo get much slower
@@ -206,11 +210,11 @@ instr playPattern
 		if (kstep > -1) then
 			;printk2 kstep 
 			
-			kfreq = (1<<ivoice)*giBaseFrequency*gkSteps[limit:k(kstep,0, giPatternLength-1) ] ; index out of range in some reason...
+			kfreq = (1<<ivoice)*gkBaseFrequency*gkSteps[limit:k(kstep,0, giPatternLength-1) ] ; index out of range in some reason...
 			;printk2 kfreq
 			;print istep,ifreq
 			;TODO: make amp lesser for every next repetition
-			event "i","sound", 0, gkSquareDuration[ivoice], 0.15*ampdbfs(-6*ivisit) ,kfreq , ivoice
+			event "i","sound", 0, gkSquareDuration[ivoice], 0.15*ampdbfs(-6*ivisit) ,kfreq , ivoice, ipanOrSpeaker
 		endif
 		kcounter += 1
 		;printk2 kcounter
@@ -234,6 +238,7 @@ instr sound
 	ifreq =  p5
 	ivoice = p6
 	iatt = 0.05
+	ipan = p7
 	
 	gkLastPlay[ivoice] init times:i()
 	
@@ -272,13 +277,29 @@ instr sound
 		awterr      wterrain    1, ifreq,kcx, 0, krx/2, krx, -1, -1
 		asig      dcblock awterr ; DC blocking filte
 		asig butterlp asig,2000
+	elseif (isound==5) then ; additive, close frequencies
+		a1 poscil 0.5,ifreq
+		a2 poscil 0.5, ifreq*(1+jspline(0.05, 1, 6))	
+		asig ntrpol a1,a2,0.5+jspline(0.4,0.5,2)
+	elseif (isound==6) then ; pluck with tail
+		kfreq expseg ifreq,p3/2,ifreq,p3/2,ifreq*random:i(0.666,1.333)
+		asig pluck 1, kfreq,ifreq,-1,3,0
+	elseif (isound==7) then ; pluck with tail
+		kfreq expseg ifreq,p3/2,ifreq,p3/2,ifreq*random:i(0.5,2)
+		anoise pinkish 0.8
+		asig rezzy butterbp(anoise, kfreq, kfreq/16),kfreq,100,1
+		asig balance asig, anoise
+
+		
+	
 	else
 		asig pinker
 		asig moogvcf asig, line(ifreq*(1+rnd(6)),p3,ifreq*(2+rnd(2))), random:i(0.5,0.9)
 	endif
 	
 	asig = asig*iamp*aenv
-	outs asig, asig	
+	aL,aR pan2 asig, ipan
+	outs aL,aR	
 	
 	;gaSignal[ivoice] = gaSignal[ivoice] + asig
 endin
@@ -286,13 +307,13 @@ endin
 giSample ftgen 0,0,0,1, "tongueram.wav",0,0,1
 
 instr heartbeat	
-	irvbtime = 4.5
+	irvbtime = 3.5
 	p3 += irvbtime
-	aenv linen 0.3,0.01,p3,0.05
+	aenv linen 0.3*chnget:k("heartvolume"),0.01,p3,0.05
 	asig loscil aenv, random:i(0.98,1.02),giSample,1
 	asig butterlp asig, random:i(500,2000)
 	
-	arev reverb2 asig*0.02, irvbtime, 0.3 
+	arev reverb2 asig*0.05, irvbtime, 0.3 
 	
 	aout ntrpol asig, arev, 0.8
 	outs aout, aout
@@ -320,7 +341,7 @@ endin
   <g>255</g>
   <b>255</b>
  </bgcolor>
- <bsbObject version="2" type="BSBButton">
+ <bsbObject type="BSBButton" version="2">
   <objectName>play pattern</objectName>
   <x>17</x>
   <y>72</y>
@@ -337,9 +358,9 @@ endin
   <image>/</image>
   <eventLine>i "randomPattern" 0 1 0 0</eventLine>
   <latch>false</latch>
-  <latched>false</latched>
+  <latched>true</latched>
  </bsbObject>
- <bsbObject version="2" type="BSBDisplay">
+ <bsbObject type="BSBDisplay" version="2">
   <objectName>actionNeeded</objectName>
   <x>78</x>
   <y>194</y>
@@ -368,7 +389,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBButton">
+ <bsbObject type="BSBButton" version="2">
   <objectName>play pattern</objectName>
   <x>19</x>
   <y>107</y>
@@ -385,9 +406,9 @@ endin
   <image>/</image>
   <eventLine>i "randomPattern" 0 1 1 0</eventLine>
   <latch>false</latch>
-  <latched>false</latched>
+  <latched>true</latched>
  </bsbObject>
- <bsbObject version="2" type="BSBButton">
+ <bsbObject type="BSBButton" version="2">
   <objectName>play pattern</objectName>
   <x>19</x>
   <y>143</y>
@@ -404,9 +425,9 @@ endin
   <image>/</image>
   <eventLine>i "randomPattern" 0 1 2 0</eventLine>
   <latch>false</latch>
-  <latched>false</latched>
+  <latched>true</latched>
  </bsbObject>
- <bsbObject version="2" type="BSBSpinBox">
+ <bsbObject type="BSBSpinBox" version="2">
   <objectName>sound1</objectName>
   <x>39</x>
   <y>292</y>
@@ -431,11 +452,11 @@ endin
   </bgcolor>
   <resolution>1.00000000</resolution>
   <minimum>0</minimum>
-  <maximum>2</maximum>
+  <maximum>6</maximum>
   <randomizable group="0">false</randomizable>
-  <value>0</value>
+  <value>5</value>
  </bsbObject>
- <bsbObject version="2" type="BSBHSlider">
+ <bsbObject type="BSBHSlider" version="2">
   <objectName>meditation</objectName>
   <x>260</x>
   <y>108</y>
@@ -453,7 +474,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject version="2" type="BSBLabel">
+ <bsbObject type="BSBLabel" version="2">
   <objectName/>
   <x>173</x>
   <y>110</y>
@@ -482,7 +503,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBHSlider">
+ <bsbObject type="BSBHSlider" version="2">
   <objectName>attention</objectName>
   <x>263</x>
   <y>145</y>
@@ -500,7 +521,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject version="2" type="BSBLabel">
+ <bsbObject type="BSBLabel" version="2">
   <objectName/>
   <x>172</x>
   <y>145</y>
@@ -529,7 +550,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBHSlider">
+ <bsbObject type="BSBHSlider" version="2">
   <objectName>lowBetaRelative</objectName>
   <x>264</x>
   <y>178</y>
@@ -547,7 +568,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject version="2" type="BSBLabel">
+ <bsbObject type="BSBLabel" version="2">
   <objectName/>
   <x>172</x>
   <y>181</y>
@@ -576,7 +597,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBHSlider">
+ <bsbObject type="BSBHSlider" version="2">
   <objectName>highBetaRelative</objectName>
   <x>263</x>
   <y>219</y>
@@ -594,7 +615,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject version="2" type="BSBLabel">
+ <bsbObject type="BSBLabel" version="2">
   <objectName/>
   <x>172</x>
   <y>220</y>
@@ -623,7 +644,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBHSlider">
+ <bsbObject type="BSBHSlider" version="2">
   <objectName>heartrate</objectName>
   <x>183</x>
   <y>365</y>
@@ -641,7 +662,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject version="2" type="BSBLabel">
+ <bsbObject type="BSBLabel" version="2">
   <objectName/>
   <x>79</x>
   <y>371</y>
@@ -671,7 +692,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBDisplay">
+ <bsbObject type="BSBDisplay" version="2">
   <objectName>heartrate</objectName>
   <x>314</x>
   <y>371</y>
