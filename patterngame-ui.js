@@ -16,6 +16,13 @@
       
     var context; // miks class-ist väljas?
     var squareDuration = 0.25;
+	
+	function isTouchScreen() {
+		if ("ontouchstart" in document.documentElement) { // check if touchdevice or computer
+			return true;
+		} else 
+			return false;
+	}
       
 	function PlayPattern() {  // parem pane see window.onload ja kasuta play tavalise funktsioonina...
 	
@@ -77,7 +84,14 @@
 	};
 	
 	 var oscil = new PlayPattern();
-     
+	
+// 	 window.onresize= function() {
+// 		 console.log("Resize"); 
+// 		 stage.setWidth(window.innerWidth*0.8);
+// 		 stage.draw();
+// 		 
+// 	};
+	 
 	window.onload = function() {
 		doConnect();
         // webaudio:
@@ -143,12 +157,14 @@
 // 	}
 	
 	//var imageObj = new Image();
-      //imageObj.onload = function() {  
+      //imageObj.onload = function() {
+      var rectWidth = (isTouchScreen()) ? window.innerWidth*0.8 : 460; 
+      var stage,layer;
       function drawEverything() { 
-       var stage = new Kinetic.Stage({
+       stage = new Kinetic.Stage({
           container: 'container',
-          width: 460,
-          height: 460
+          width:  rectWidth,//window.innerWidth*0.8,
+          height: rectWidth//window.innerWidth*0.8
         });
         
         var padding = (stage.getHeight()-32)*0.2/MAX_PITCHES;
@@ -156,7 +172,7 @@
 		//console.log(padding, square_width);
 		//stage.setHeight();
         
-        var layer = new Kinetic.Layer();
+        layer = new Kinetic.Layer();
         
               
         
@@ -215,7 +231,7 @@
 				});
 				
 				
-				note_rect[column][row].on("click", function () { 
+				note_rect[column][row].on("click", function () {  // perhaps on("click tap")
 					var this_column = this.getAttr("time_index");
 					var newValue = (this.getAttr('onoff')==0) ? 1 : 0 ; // toggle the value
 					var voice = parseInt(getRadioValue("octave"));	
