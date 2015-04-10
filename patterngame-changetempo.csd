@@ -155,9 +155,9 @@ instr clockAndChannels
 	
 	; changes to sounds and durations
 	if (metro(1/30,0.1)==1) then
-		chnset  int(random:k(1,5))*0.2, "square1"
-		chnset  int(random:k(1,5))*0.2, "square2"
-		chnset  int(random:k(1,5))*0.2, "square3"	
+		chnset  (1<<int(random:k(0,2.1)))*0.25, "square1"; 1/2/4 * 0.2
+		chnset  (1<<int(random:k(0,2.1)))*0.25, "square2"
+		chnset  (1<<int(random:k(0,2.1)))*0.25, "square3"	
 	endif 
 	if (metro(1/20,2.2)==1) then
 		chnset  int(random:k(0,8)),"sound1"
@@ -341,7 +341,7 @@ endin
   <g>255</g>
   <b>255</b>
  </bgcolor>
- <bsbObject type="BSBButton" version="2">
+ <bsbObject version="2" type="BSBButton">
   <objectName>play pattern</objectName>
   <x>17</x>
   <y>72</y>
@@ -360,7 +360,7 @@ endin
   <latch>false</latch>
   <latched>true</latched>
  </bsbObject>
- <bsbObject type="BSBDisplay" version="2">
+ <bsbObject version="2" type="BSBDisplay">
   <objectName>actionNeeded</objectName>
   <x>78</x>
   <y>194</y>
@@ -370,7 +370,7 @@ endin
   <visible>true</visible>
   <midichan>0</midichan>
   <midicc>0</midicc>
-  <label>0.000</label>
+  <label>10.000</label>
   <alignment>left</alignment>
   <font>Liberation Sans</font>
   <fontsize>10</fontsize>
@@ -389,7 +389,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBButton" version="2">
+ <bsbObject version="2" type="BSBButton">
   <objectName>play pattern</objectName>
   <x>19</x>
   <y>107</y>
@@ -408,7 +408,7 @@ endin
   <latch>false</latch>
   <latched>true</latched>
  </bsbObject>
- <bsbObject type="BSBButton" version="2">
+ <bsbObject version="2" type="BSBButton">
   <objectName>play pattern</objectName>
   <x>19</x>
   <y>143</y>
@@ -427,7 +427,7 @@ endin
   <latch>false</latch>
   <latched>true</latched>
  </bsbObject>
- <bsbObject type="BSBSpinBox" version="2">
+ <bsbObject version="2" type="BSBSpinBox">
   <objectName>sound1</objectName>
   <x>39</x>
   <y>292</y>
@@ -456,7 +456,7 @@ endin
   <randomizable group="0">false</randomizable>
   <value>5</value>
  </bsbObject>
- <bsbObject type="BSBHSlider" version="2">
+ <bsbObject version="2" type="BSBHSlider">
   <objectName>meditation</objectName>
   <x>260</x>
   <y>108</y>
@@ -474,7 +474,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject type="BSBLabel" version="2">
+ <bsbObject version="2" type="BSBLabel">
   <objectName/>
   <x>173</x>
   <y>110</y>
@@ -503,7 +503,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBHSlider" version="2">
+ <bsbObject version="2" type="BSBHSlider">
   <objectName>attention</objectName>
   <x>263</x>
   <y>145</y>
@@ -521,7 +521,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject type="BSBLabel" version="2">
+ <bsbObject version="2" type="BSBLabel">
   <objectName/>
   <x>172</x>
   <y>145</y>
@@ -550,7 +550,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBHSlider" version="2">
+ <bsbObject version="2" type="BSBHSlider">
   <objectName>lowBetaRelative</objectName>
   <x>264</x>
   <y>178</y>
@@ -568,7 +568,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject type="BSBLabel" version="2">
+ <bsbObject version="2" type="BSBLabel">
   <objectName/>
   <x>172</x>
   <y>181</y>
@@ -597,7 +597,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBHSlider" version="2">
+ <bsbObject version="2" type="BSBHSlider">
   <objectName>highBetaRelative</objectName>
   <x>263</x>
   <y>219</y>
@@ -615,7 +615,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject type="BSBLabel" version="2">
+ <bsbObject version="2" type="BSBLabel">
   <objectName/>
   <x>172</x>
   <y>220</y>
@@ -644,7 +644,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBHSlider" version="2">
+ <bsbObject version="2" type="BSBHSlider">
   <objectName>heartrate</objectName>
   <x>183</x>
   <y>365</y>
@@ -662,7 +662,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject type="BSBLabel" version="2">
+ <bsbObject version="2" type="BSBLabel">
   <objectName/>
   <x>79</x>
   <y>371</y>
@@ -692,7 +692,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject type="BSBDisplay" version="2">
+ <bsbObject version="2" type="BSBDisplay">
   <objectName>heartrate</objectName>
   <x>314</x>
   <y>371</y>
