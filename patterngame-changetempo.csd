@@ -55,7 +55,7 @@ chn_k "actionNeeded",2
 
 
 chnset 1,"tempo"
-chnset 0.5, "level"
+chnset 0.9, "level"
 chnset 1, "free1"
 chnset 1, "free2"
 chnset 1, "free3"
@@ -64,7 +64,7 @@ chnset 0.25, "square2"
 chnset 0.25, "square3"
 chnset 0, "actionNeeded" ; singals that a voice has beeb silent for long time and needs a new random pattern
 chnset 60, "heartrate"
-chnset 0.5, "heartvolume"
+chnset 0.6, "heartvolume"
 ;
 
 seed 0
@@ -341,7 +341,7 @@ endin
   <g>255</g>
   <b>255</b>
  </bgcolor>
- <bsbObject version="2" type="BSBButton">
+ <bsbObject type="BSBButton" version="2">
   <objectName>play pattern</objectName>
   <x>17</x>
   <y>72</y>
@@ -360,7 +360,7 @@ endin
   <latch>false</latch>
   <latched>true</latched>
  </bsbObject>
- <bsbObject version="2" type="BSBDisplay">
+ <bsbObject type="BSBDisplay" version="2">
   <objectName>actionNeeded</objectName>
   <x>78</x>
   <y>194</y>
@@ -370,7 +370,7 @@ endin
   <visible>true</visible>
   <midichan>0</midichan>
   <midicc>0</midicc>
-  <label>10.000</label>
+  <label>12.000</label>
   <alignment>left</alignment>
   <font>Liberation Sans</font>
   <fontsize>10</fontsize>
@@ -389,7 +389,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBButton">
+ <bsbObject type="BSBButton" version="2">
   <objectName>play pattern</objectName>
   <x>19</x>
   <y>107</y>
@@ -408,7 +408,7 @@ endin
   <latch>false</latch>
   <latched>true</latched>
  </bsbObject>
- <bsbObject version="2" type="BSBButton">
+ <bsbObject type="BSBButton" version="2">
   <objectName>play pattern</objectName>
   <x>19</x>
   <y>143</y>
@@ -427,7 +427,7 @@ endin
   <latch>false</latch>
   <latched>true</latched>
  </bsbObject>
- <bsbObject version="2" type="BSBSpinBox">
+ <bsbObject type="BSBSpinBox" version="2">
   <objectName>sound1</objectName>
   <x>39</x>
   <y>292</y>
@@ -454,9 +454,9 @@ endin
   <minimum>0</minimum>
   <maximum>6</maximum>
   <randomizable group="0">false</randomizable>
-  <value>5</value>
+  <value>1</value>
  </bsbObject>
- <bsbObject version="2" type="BSBHSlider">
+ <bsbObject type="BSBHSlider" version="2">
   <objectName>meditation</objectName>
   <x>260</x>
   <y>108</y>
@@ -474,7 +474,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject version="2" type="BSBLabel">
+ <bsbObject type="BSBLabel" version="2">
   <objectName/>
   <x>173</x>
   <y>110</y>
@@ -503,7 +503,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBHSlider">
+ <bsbObject type="BSBHSlider" version="2">
   <objectName>attention</objectName>
   <x>263</x>
   <y>145</y>
@@ -521,7 +521,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject version="2" type="BSBLabel">
+ <bsbObject type="BSBLabel" version="2">
   <objectName/>
   <x>172</x>
   <y>145</y>
@@ -550,7 +550,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBHSlider">
+ <bsbObject type="BSBHSlider" version="2">
   <objectName>lowBetaRelative</objectName>
   <x>264</x>
   <y>178</y>
@@ -568,7 +568,7 @@ endin
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject version="2" type="BSBLabel">
+ <bsbObject type="BSBLabel" version="2">
   <objectName/>
   <x>172</x>
   <y>181</y>
@@ -597,7 +597,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBHSlider">
+ <bsbObject type="BSBHSlider" version="2">
   <objectName>highBetaRelative</objectName>
   <x>263</x>
   <y>219</y>
@@ -609,13 +609,13 @@ endin
   <midicc>0</midicc>
   <minimum>0.00000000</minimum>
   <maximum>1.00000000</maximum>
-  <value>0.77777778</value>
+  <value>0.25000000</value>
   <mode>lin</mode>
   <mouseControl act="jump">continuous</mouseControl>
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject version="2" type="BSBLabel">
+ <bsbObject type="BSBLabel" version="2">
   <objectName/>
   <x>172</x>
   <y>220</y>
@@ -644,7 +644,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBHSlider">
+ <bsbObject type="BSBHSlider" version="2">
   <objectName>heartrate</objectName>
   <x>183</x>
   <y>365</y>
@@ -656,13 +656,13 @@ endin
   <midicc>0</midicc>
   <minimum>40.00000000</minimum>
   <maximum>120.00000000</maximum>
-  <value>84.44400000</value>
+  <value>61.19658120</value>
   <mode>lin</mode>
   <mouseControl act="jump">continuous</mouseControl>
   <resolution>-1.00000000</resolution>
   <randomizable group="0">false</randomizable>
  </bsbObject>
- <bsbObject version="2" type="BSBLabel">
+ <bsbObject type="BSBLabel" version="2">
   <objectName/>
   <x>79</x>
   <y>371</y>
@@ -692,7 +692,7 @@ endin
   <borderradius>1</borderradius>
   <borderwidth>1</borderwidth>
  </bsbObject>
- <bsbObject version="2" type="BSBDisplay">
+ <bsbObject type="BSBDisplay" version="2">
   <objectName>heartrate</objectName>
   <x>314</x>
   <y>371</y>
@@ -702,7 +702,7 @@ endin
   <visible>true</visible>
   <midichan>0</midichan>
   <midicc>0</midicc>
-  <label>84.444</label>
+  <label>61.197</label>
   <alignment>left</alignment>
   <font>Liberation Sans</font>
   <fontsize>10</fontsize>

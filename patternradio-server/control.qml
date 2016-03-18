@@ -28,7 +28,7 @@ Rectangle {
 
     WebSocket {
         id: socket
-        url: "ws://localhost:10010/ws"
+        url: "ws://tarmo.webhop.net:10010/ws"
         onTextMessageReceived: {
            console.log("Received message: ",message);
         }
